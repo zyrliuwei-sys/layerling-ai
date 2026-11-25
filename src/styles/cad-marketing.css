@@ -791,52 +791,126 @@
 }
 .cadm-home-lead {
   min-width: 0;
+  align-self: start;
+  padding-block-start: clamp(56px, 8.25vw, 120px);
 }
 .cadm-home-lead .cadm-eyebrow {
-  margin-block-end: clamp(16px, 2.1vw, 28px);
+  max-width: 26rem;
+  gap: 14px;
+  margin-block-end: clamp(17px, 2vw, 28px);
+}
+.cadm-home-lead .cadm-eyebrow::before {
+  content: none;
+}
+.cadm-home-lead .cadm-eyebrow::after {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    var(--brand-link) 18px,
+    var(--cad-line) 18px
+  );
+  content: '';
 }
 .cadm-home-lead h1 {
-  font-size: clamp(2.4rem, 5.55vw, 6rem);
-  line-height: 0.92;
-  letter-spacing: -0.043em;
+  font-size: clamp(2.9rem, 4.85vw, 4.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.038em;
   text-wrap: balance;
   overflow-wrap: anywhere;
-  color: var(--brand-link);
-}
-.cadm-home-lead h1::first-line {
   color: var(--cad-ink);
 }
 .cadm-home-description {
-  max-width: 36ch;
-  margin-block: clamp(19px, 2.7vw, 37px) clamp(20px, 2.5vw, 32px);
+  max-width: 37ch;
+  margin-block: clamp(16px, 1.9vw, 26px) clamp(22px, 2.4vw, 34px);
   color: var(--cad-muted);
-  font-size: clamp(0.97rem, 1.31vw, 1.21rem);
+  font-size: clamp(0.97rem, 1.24vw, 1.15rem);
   line-height: 1.58;
   text-wrap: pretty;
 }
 .cadm-home-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px clamp(14px, 2vw, 27px);
+  display: grid;
+  max-width: 26rem;
+  border: 1px solid var(--cad-line);
+  border-radius: 8px;
+  background: var(--cad-surface);
 }
-.cadm-home-actions .cadm-button {
-  min-height: 49px;
-  padding-inline: 16px;
-  border-radius: 5px;
-}
-.cadm-home-studio-link {
-  display: inline-flex;
-  min-height: 46px;
+.cadm-home-action {
+  display: grid;
+  min-height: 66px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
+  padding: 9px 11px 9px 12px;
   color: var(--cad-ink);
-  font-size: 0.87rem;
-  font-weight: 620;
-  white-space: nowrap;
+  transition: background-color 0.16s ease;
 }
-.cadm-home-studio-link:hover {
+.cadm-home-action:first-child {
+  border-radius: 7px 7px 0 0;
+}
+.cadm-home-action:last-child {
+  border-block-start: 1px solid var(--cad-line);
+  border-radius: 0 0 7px 7px;
+}
+.cadm-home-action:is(:hover, :focus-visible) {
+  background: var(--secondary);
+}
+.cadm-home-action:active {
+  background: var(--accent);
+}
+.cadm-home-action--editor,
+.cadm-home-action--editor:active {
+  background: color-mix(in oklab, var(--cad-surface), var(--accent) 48%);
+}
+.cadm-home-action--editor:is(:hover, :focus-visible) {
+  background: var(--accent);
+}
+.cadm-home-action-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid var(--cad-line);
+  border-radius: 5px;
   color: var(--brand-link);
+}
+.cadm-home-action--editor .cadm-home-action-icon {
+  border-color: var(--brand-signal);
+  background: var(--brand-signal);
+  color: var(--brand-signal-ink);
+}
+.cadm-home-action-copy {
+  display: grid;
+  gap: 2px;
+}
+.cadm-home-action-copy strong {
+  font-size: 0.925rem;
+  font-weight: 650;
+  line-height: 1.2;
+}
+.cadm-home-action-copy small {
+  color: var(--cad-muted);
+  font-size: 0.775rem;
+  line-height: 1.35;
+}
+.cadm-home-action-arrow {
+  color: var(--cad-muted);
+  transition:
+    color 0.16s ease,
+    transform 0.16s ease;
+}
+.cadm-home-action:is(:hover, :focus-visible) .cadm-home-action-arrow {
+  transform: translateY(2px);
+  color: var(--brand-link);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cadm-home-action,
+  .cadm-home-action-arrow {
+    transition: none;
+  }
+  .cadm-home-action:is(:hover, :focus-visible) .cadm-home-action-arrow {
+    transform: none;
+  }
 }
 .cadm-assembly {
   min-width: 0;
@@ -1082,7 +1156,6 @@
 }
 
 @media (min-width: 1150px) {
-  .cadm-home-lead h1,
   .cadm-hero h2,
   .cadm-example-section .cadm-section-heading h2 {
     font-size: var(--text-7xl);
@@ -1093,6 +1166,9 @@
     max-width: 812px;
     grid-template-columns: minmax(0, 1fr);
     gap: clamp(18px, 3vw, 28px);
+  }
+  .cadm-home-lead {
+    padding-block-start: 0;
   }
   .cadm-home-lead h1 {
     max-width: 20ch;
@@ -1136,9 +1212,8 @@
     font-size: 0.93rem;
     line-height: 1.42;
   }
-  .cadm-home-actions .cadm-button,
-  .cadm-home-studio-link {
-    min-height: 40px;
+  .cadm-home-action {
+    min-height: 60px;
   }
 }
 @media (max-width: 460px) {

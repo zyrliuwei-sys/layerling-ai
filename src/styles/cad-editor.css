@@ -135,6 +135,8 @@ html:has(.cad-editor-stage--expanded) {
   border: 1px solid var(--cad-line);
   border-radius: var(--brand-corner);
   background: var(--cad-surface);
+  box-shadow: 0 12px 30px
+    color-mix(in oklab, var(--brand-board), transparent 82%);
 }
 .cadm-online-editor
   .cad-editor-stage:not(:fullscreen, .cad-editor-stage--expanded)
@@ -145,12 +147,54 @@ html:has(.cad-editor-stage--expanded) {
   margin: 0;
   padding: 9px clamp(9px, 1.35vw, 18px);
   border-bottom: 1px solid var(--cad-line);
+  background: color-mix(in oklab, var(--cad-surface), var(--cad-paper) 28%);
 }
 .cadm-online-editor .cad-editor-actions .cadm-button {
   min-height: 44px;
   padding: 6px 10px;
   gap: 7px;
   font-size: 0.78rem;
+}
+.cadm-online-editor
+  .cad-editor-stage[data-active='true']:not(
+    :fullscreen,
+    .cad-editor-stage--expanded
+  )
+  .cad-editor-actions
+  .cadm-button {
+  border-color: var(--cad-line);
+  border-radius: 5px;
+  background: var(--cad-surface);
+  color: var(--cad-ink);
+}
+.cadm-online-editor
+  .cad-editor-stage[data-active='true']:not(
+    :fullscreen,
+    .cad-editor-stage--expanded
+  )
+  .cad-editor-actions
+  .cadm-button:hover {
+  border-color: var(--brand-link);
+  background: var(--secondary);
+}
+.cadm-online-editor
+  .cad-editor-stage[data-active='true']:not(
+    :fullscreen,
+    .cad-editor-stage--expanded
+  )
+  .cad-editor-actions
+  .cadm-button:active {
+  background: var(--accent);
+}
+.cadm-online-editor .cad-editor-footer {
+  font-size: 0.81rem;
+}
+.cadm-online-editor .cad-editor-footer a {
+  white-space: nowrap;
+  text-decoration-color: var(--cad-line);
+}
+.cadm-online-editor .cad-editor-footer a:is(:hover, :focus-visible) {
+  text-decoration-color: currentColor;
 }
 .cadm-online-editor
   .cad-editor-stage:not(:fullscreen, .cad-editor-stage--expanded)

@@ -103,7 +103,7 @@
   letter-spacing: -0.015em;
   text-wrap: balance;
 }
-.cad-article-copy h2:first-child {
+.cad-article-copy h2:first-child:where(:not(.cad-article--guide h2)) {
   margin-top: 0;
 }
 .cad-article-copy :is(p, li) {

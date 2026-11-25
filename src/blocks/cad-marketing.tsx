@@ -212,15 +212,35 @@ export function CadHomeHero({ children }: { children: ReactNode }) {
         <p className="cadm-home-description">{m['cad.editor.home_intro']()}</p>
         <div className="cadm-home-actions">
           <Link
-            className="cadm-button cadm-button--primary"
+            className="cadm-home-action cadm-home-action--editor"
             href="#layerling-editor"
           >
-            {m['cad.marketing.nav_open_editor']()}{' '}
-            <ArrowDown size={17} aria-hidden="true" />
+            <span className="cadm-home-action-icon">
+              <Box size={19} aria-hidden="true" />
+            </span>
+            <span className="cadm-home-action-copy">
+              <strong>{m['cad.marketing.nav_open_editor']()}</strong>
+              <small>{m['cad.marketing.home_editor_detail']()}</small>
+            </span>
+            <ArrowDown
+              className="cadm-home-action-arrow"
+              size={17}
+              aria-hidden="true"
+            />
           </Link>
-          <Link className="cadm-home-studio-link" href="#cad-ai-studio">
-            {m['cad.marketing.nav_studio']()}{' '}
-            <ArrowDown size={15} aria-hidden="true" />
+          <Link className="cadm-home-action" href="#cad-ai-studio">
+            <span className="cadm-home-action-icon">
+              <Braces size={19} aria-hidden="true" />
+            </span>
+            <span className="cadm-home-action-copy">
+              <strong>{m['cad.marketing.nav_studio']()}</strong>
+              <small>{m['cad.marketing.home_studio_detail']()}</small>
+            </span>
+            <ArrowDown
+              className="cadm-home-action-arrow"
+              size={17}
+              aria-hidden="true"
+            />
           </Link>
         </div>
       </div>
