@@ -33,6 +33,8 @@ drizzle
 .codex
 .vercel
 .wrangler
+**/.dev.vars
+**/.dev.vars.*
 wrangler.jsonc
 wrangler.example.jsonc
 

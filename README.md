@@ -120,10 +120,11 @@ requires `CONFIG_ENCRYPTION_KEY` in the server environment.
 
 The production Worker `layerling-ai` on [layerling.org](https://layerling.org)
 deploys from `main` through Workers Builds. Use the repository root and
-`pnpm run cf:deploy:ci` as the deploy command. Set
-`CLOUDFLARE_D1_DATABASE_ID` to the production D1 database ID in the build
-environment. The deploy script creates the Wrangler config for the build and
-binds the existing database as `DB`.
+`pnpm run cf:deploy:ci` as the deploy command. Set the build environment
+variables `NODE_VERSION=24.14.1`, `PNPM_VERSION=11.15.1`, and
+`CLOUDFLARE_D1_DATABASE_ID` to the production D1 database ID. The deploy script
+creates the Wrangler config for the build and binds the existing database as
+`DB`. Only pushes to `main` trigger builds.
 
 Set `AUTH_SECRET` and `CONFIG_ENCRYPTION_KEY` as Worker runtime secrets.
 Review and apply production D1 migrations separately before deploying code
