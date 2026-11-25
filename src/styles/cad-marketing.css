@@ -784,133 +784,75 @@
 }
 .cadm-home-hero {
   display: grid;
-  grid-template-columns: minmax(0, 0.74fr) minmax(0, 1.26fr);
-  align-items: center;
-  gap: clamp(23px, 3.4vw, 54px);
-  padding-block: clamp(25px, 3.5vw, 54px) clamp(40px, 5.1vw, 74px);
+  max-width: 80rem;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(18px, 2.65vw, 38px);
+  padding-block: clamp(32px, 4.15vw, 60px) clamp(40px, 5.1vw, 74px);
 }
 .cadm-home-lead {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 0.8fr);
+  align-items: end;
+  gap: clamp(24px, 4vw, 58px);
+}
+.cadm-home-heading,
+.cadm-home-details {
   min-width: 0;
-  align-self: start;
-  padding-block-start: clamp(56px, 8.25vw, 120px);
 }
-.cadm-home-lead .cadm-eyebrow {
-  max-width: 26rem;
-  gap: 14px;
-  margin-block-end: clamp(17px, 2vw, 28px);
+.cadm-home-heading .cadm-eyebrow {
+  margin-block-end: clamp(13px, 1.5vw, 21px);
 }
-.cadm-home-lead .cadm-eyebrow::before {
-  content: none;
-}
-.cadm-home-lead .cadm-eyebrow::after {
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(
-    to right,
-    var(--brand-link) 18px,
-    var(--cad-line) 18px
-  );
-  content: '';
-}
-.cadm-home-lead h1 {
-  font-size: clamp(2.9rem, 4.85vw, 4.5rem);
-  line-height: 0.98;
-  letter-spacing: -0.038em;
+.cadm-home-heading h1 {
+  max-width: 19ch;
+  font-size: clamp(2.85rem, 5.25vw, 4.75rem);
+  line-height: 0.97;
+  letter-spacing: -0.04em;
   text-wrap: balance;
   overflow-wrap: anywhere;
-  color: var(--cad-ink);
+}
+.cadm-home-details {
+  padding: 2px 0 2px clamp(16px, 2.35vw, 34px);
+  border-inline-start: 1px solid var(--cad-line);
 }
 .cadm-home-description {
-  max-width: 37ch;
-  margin-block: clamp(16px, 1.9vw, 26px) clamp(22px, 2.4vw, 34px);
+  max-width: 40ch;
+  margin-block-end: 17px;
   color: var(--cad-muted);
-  font-size: clamp(0.97rem, 1.24vw, 1.15rem);
-  line-height: 1.58;
+  font-size: clamp(0.98rem, 1.22vw, 1.13rem);
+  line-height: 1.55;
   text-wrap: pretty;
 }
 .cadm-home-actions {
-  display: grid;
-  max-width: 26rem;
-  border: 1px solid var(--cad-line);
-  border-radius: 8px;
-  background: var(--cad-surface);
-}
-.cadm-home-action {
-  display: grid;
-  min-height: 66px;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
-  padding: 9px 11px 9px 12px;
+  gap: 6px 19px;
+}
+.cadm-home-actions .cadm-button {
+  min-height: 44px;
+  gap: 9px;
+  border-radius: 6px;
+  padding-inline: 13px;
+}
+.cadm-home-actions .cadm-button:active {
+  background: var(--brand-signal-hover);
+}
+.cadm-home-studio-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
   color: var(--cad-ink);
-  transition: background-color 0.16s ease;
+  font-size: 0.875rem;
+  font-weight: 640;
+  white-space: nowrap;
+  text-underline-offset: 4px;
 }
-.cadm-home-action:first-child {
-  border-radius: 7px 7px 0 0;
+.cadm-home-studio-link:is(:hover, :focus-visible) {
+  text-decoration: underline;
 }
-.cadm-home-action:last-child {
-  border-block-start: 1px solid var(--cad-line);
-  border-radius: 0 0 7px 7px;
-}
-.cadm-home-action:is(:hover, :focus-visible) {
-  background: var(--secondary);
-}
-.cadm-home-action:active {
-  background: var(--accent);
-}
-.cadm-home-action--editor,
-.cadm-home-action--editor:active {
-  background: color-mix(in oklab, var(--cad-surface), var(--accent) 48%);
-}
-.cadm-home-action--editor:is(:hover, :focus-visible) {
-  background: var(--accent);
-}
-.cadm-home-action-icon {
-  display: grid;
-  width: 38px;
-  height: 38px;
-  place-items: center;
-  border: 1px solid var(--cad-line);
-  border-radius: 5px;
+.cadm-home-studio-link:active {
   color: var(--brand-link);
-}
-.cadm-home-action--editor .cadm-home-action-icon {
-  border-color: var(--brand-signal);
-  background: var(--brand-signal);
-  color: var(--brand-signal-ink);
-}
-.cadm-home-action-copy {
-  display: grid;
-  gap: 2px;
-}
-.cadm-home-action-copy strong {
-  font-size: 0.925rem;
-  font-weight: 650;
-  line-height: 1.2;
-}
-.cadm-home-action-copy small {
-  color: var(--cad-muted);
-  font-size: 0.775rem;
-  line-height: 1.35;
-}
-.cadm-home-action-arrow {
-  color: var(--cad-muted);
-  transition:
-    color 0.16s ease,
-    transform 0.16s ease;
-}
-.cadm-home-action:is(:hover, :focus-visible) .cadm-home-action-arrow {
-  transform: translateY(2px);
-  color: var(--brand-link);
-}
-@media (prefers-reduced-motion: reduce) {
-  .cadm-home-action,
-  .cadm-home-action-arrow {
-    transition: none;
-  }
-  .cadm-home-action:is(:hover, :focus-visible) .cadm-home-action-arrow {
-    transform: none;
-  }
 }
 .cadm-assembly {
   min-width: 0;
@@ -1161,22 +1103,21 @@
     font-size: var(--text-7xl);
   }
 }
-@media (max-width: 1050px) {
-  .cadm-home-hero {
-    max-width: 812px;
-    grid-template-columns: minmax(0, 1fr);
-    gap: clamp(18px, 3vw, 28px);
-  }
+@media (max-width: 760px) {
   .cadm-home-lead {
-    padding-block-start: 0;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
   }
-  .cadm-home-lead h1 {
-    max-width: 20ch;
-    font-size: clamp(2.55rem, 6vw, 4.5rem);
+  .cadm-home-heading h1 {
+    font-size: clamp(2.25rem, 7.3vw, 3.6rem);
+  }
+  .cadm-home-details {
+    padding: 0;
+    border-inline-start: 0;
   }
   .cadm-home-description {
-    max-width: 54ch;
-    margin-block: 14px 18px;
+    max-width: 50ch;
+    margin-block-end: 12px;
   }
 }
 @media (max-width: 1000px) {
@@ -1195,25 +1136,13 @@
   }
 }
 @media (max-width: 600px) {
-  .cadm-home-lead h1,
   .cadm-hero h2,
   .cadm-example-section .cadm-section-heading h2 {
     font-size: var(--text-4xl);
   }
   .cadm-home-hero {
     gap: 16px;
-    padding-block-start: 20px;
-  }
-  .cadm-home-lead .cadm-eyebrow {
-    margin-block-end: 12px;
-  }
-  .cadm-home-description {
-    margin-block: 12px;
-    font-size: 0.93rem;
-    line-height: 1.42;
-  }
-  .cadm-home-action {
-    min-height: 60px;
+    padding-block-start: 23px;
   }
 }
 @media (max-width: 460px) {
