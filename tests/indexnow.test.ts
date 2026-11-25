@@ -32,6 +32,7 @@ const { config, user } = await import('../src/config/db/schema');
 const { envConfigs } = await import('../src/config');
 const { indexNowAccess } = await import('../src/lib/indexnow');
 const {
+  INDEXNOW_ENDPOINTS,
   getIndexNowKey,
   saveIndexNowKey,
   submitUrls,
@@ -246,7 +247,7 @@ test('submission deduplicates URLs, removes fragments, and stops after HTTP 202'
       assert.equal(body.host, 'indexnow.example.com');
       assert.equal(body.keyLocation, `${origin}/${key}.txt`);
       assert.deepEqual(body.urlList, [`${origin}/page`]);
-      assert.equal(options?.redirect, 'error');
+      assert.equal(options?.redirect, 'manual');
       assert.ok(options?.signal);
       return new Response('', { status: 202 });
     }
@@ -274,6 +275,29 @@ test('provider retries are bounded and never expose its response body', async (t
   assert.equal(result.results[0].ok, true);
   assert.equal(fetchMock.mock.callCount(), 3);
   assert.ok(!JSON.stringify(result).includes(key));
+});
+
+test('provider redirects are reported and the request is never sent to the Location', async (t) => {
+  const requests: string[] = [];
+  t.mock.method(
+    globalThis,
+    'fetch',
+    async (url: RequestInfo | URL, options?: RequestInit) => {
+      requests.push(String(url));
+      assert.equal(options?.redirect, 'manual');
+      if (requests.length === 1) {
+        return Response.redirect('https://redirect.example.test/indexnow', 307);
+      }
+      return new Response(null, { status: 202 });
+    }
+  );
+  const result = await submitUrls(key, [origin]);
+  assert.deepEqual(requests, INDEXNOW_ENDPOINTS.slice(0, 2));
+  assert.deepEqual(
+    result.results[0].attempts.map(({ status }) => status),
+    [307, 202]
+  );
+  assert.equal(result.results[0].ok, true);
 });
 
 test('invalid ownership is reported without retrying on other engines', async (t) => {

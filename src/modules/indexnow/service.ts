@@ -147,7 +147,9 @@ export async function submitUrls(
           'User-Agent': `IndexNowClient (+${siteOrigin()})`,
         },
         body,
-        redirect: 'error',
+        // Workers supports manual redirects. Keep the POST on the configured
+        // endpoint even if a provider returns a Location header.
+        redirect: 'manual',
         signal: AbortSignal.timeout(10_000),
       });
       status = response.status;
