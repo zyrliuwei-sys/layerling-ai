@@ -17,17 +17,18 @@ export function useCurrentLocale(): string {
 
 type LinkProps = Omit<ComponentProps<'a'>, 'href'> & {
   href: string;
+  search?: Record<string, unknown>;
   locale?: string; // kept for API compat; locale switching goes via setLocale()
   prefetch?: boolean | string;
   children?: ReactNode;
 };
 
-export function Link({ href, locale, prefetch, ...rest }: LinkProps) {
+export function Link({ href, search, locale, prefetch, ...rest }: LinkProps) {
   if (/^(https?:|mailto:|tel:|#)/.test(href)) {
     return <a href={href} {...rest} />;
   }
   const Comp = RouterLink as any;
-  return <Comp to={href} {...rest} />;
+  return <Comp to={href} search={search} {...rest} />;
 }
 
 export function usePathname(): string {

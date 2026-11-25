@@ -1,0 +1,149 @@
+.cad-article-main {
+  padding-block: clamp(36px, 5.3vw, 80px) clamp(55px, 9vw, 125px);
+}
+.cad-article {
+  max-width: 52rem;
+  margin-inline: auto;
+}
+.cad-article--guide {
+  max-width: none;
+}
+.cad-article-heading {
+  padding-bottom: 29px;
+  border-bottom: 1px solid var(--cad-line);
+}
+.cad-article--guide .cad-article-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.78fr);
+  gap: clamp(32px, 5.5vw, 84px);
+  align-items: center;
+  padding-bottom: clamp(28px, 5vw, 67px);
+}
+.cad-article-heading h1 {
+  max-width: 15ch;
+  font-size: clamp(3rem, 7.1vw, 6.8rem);
+}
+.cad-article-heading p {
+  max-width: 53ch;
+  margin-top: 16px;
+  color: var(--cad-muted);
+  font-size: clamp(1rem, 1.4vw, 1.19rem);
+}
+.cad-article-heading .cadm-button {
+  margin-top: 22px;
+}
+.cad-article-heading .cad-article-date {
+  margin-top: 13px;
+  font: 0.72rem/1.5 var(--cad-mono);
+}
+.cad-article-cover {
+  overflow: hidden;
+  border: 1px solid var(--cad-line);
+  border-radius: var(--brand-corner);
+  background-color: var(--brand-board);
+  background-image: radial-gradient(
+    circle,
+    var(--brand-board-line) 1px,
+    transparent 1px
+  );
+  background-position: center;
+  background-size: 22px 22px;
+}
+.cad-article-cover img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1.62;
+  object-fit: cover;
+}
+.cad-article-body {
+  padding-top: clamp(24px, 4.5vw, 58px);
+}
+.cad-article--guide .cad-article-body {
+  display: grid;
+  grid-template-columns: minmax(174px, 0.27fr) minmax(0, 1fr);
+  gap: clamp(24px, 5.2vw, 75px);
+}
+.cad-article-sidebar nav {
+  position: sticky;
+  top: 22px;
+  padding: 13px 0 13px 13px;
+  border-inline-start: 1px solid var(--cad-line);
+}
+.cad-article-sidebar p {
+  margin: 0 0 8px;
+  color: var(--brand-link);
+  font: 0.74rem/1.5 var(--cad-mono);
+}
+.cad-article-sidebar ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+.cad-article-sidebar a {
+  display: block;
+  padding-block: 4px;
+  color: var(--cad-muted);
+  font-size: 0.87rem;
+}
+.cad-article-sidebar a:hover {
+  color: var(--cad-ink);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.cad-article-copy {
+  max-width: 73ch;
+  font-size: clamp(1rem, 1.38vw, 1.12rem);
+}
+.cad-article-copy h2 {
+  margin: 1.5em 0 0.4em;
+  scroll-margin-top: 23px;
+  color: var(--cad-ink);
+  font: 700 clamp(2rem, 4vw, 3.55rem)/1.04 var(--font-display);
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+.cad-article-copy h2:first-child {
+  margin-top: 0;
+}
+.cad-article-copy :is(p, li) {
+  margin-block: 0.8em 0;
+  line-height: 1.73;
+}
+.cad-article-copy a {
+  color: var(--brand-link);
+  font-weight: 580;
+  text-decoration: underline;
+  text-underline-offset: 0.23em;
+}
+.cad-article-copy blockquote {
+  margin-block: 1.3em;
+  padding: 1em 1.2em;
+  border: 1px solid var(--cad-line);
+  border-inline-start: 3px solid var(--brand-link);
+  border-radius: 7px;
+  background: var(--cad-surface);
+  font-family: var(--cad-mono);
+  font-size: 0.9em;
+  font-style: normal;
+}
+.cad-article-copy blockquote p {
+  margin: 0;
+}
+
+@media (max-width: 780px) {
+  .cad-article--guide .cad-article-heading,
+  .cad-article--guide .cad-article-body {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .cad-article-cover img {
+    aspect-ratio: 1.6;
+  }
+  .cad-article-sidebar nav {
+    position: static;
+  }
+  .cad-article-sidebar ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

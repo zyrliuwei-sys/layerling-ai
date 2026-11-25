@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import { getAuth } from '@/core/auth';
+import { ADMIN_ACCESS_PERMISSION } from '@/core/auth/rbac';
 import { getConfig } from '@/modules/config/service';
 import { getUserPlan } from '@/modules/invite-codes/service';
 import { hasPermission } from '@/modules/rbac/service';
@@ -23,7 +24,7 @@ async function GET({ request }: { request: Request }) {
     // pass through the email sign-up invite check.
     const inviteRequired = (await getConfig('invite_code_required')) === 'true';
     const isAdmin = inviteRequired
-      ? await hasPermission(session.user.id, 'admin.*')
+      ? await hasPermission(session.user.id, ADMIN_ACCESS_PERMISSION)
       : false;
     const needsInvite = inviteRequired && plan === 'none' && !isAdmin;
 
@@ -37,8 +38,8 @@ async function GET({ request }: { request: Request }) {
       authorized: plan === 'trial' || plan === 'member',
       needsInvite,
     });
-  } catch (error: any) {
-    return respErr(error.message || 'Internal error');
+  } catch {
+    return respErr('Could not load account information', { status: 500 });
   }
 }
 

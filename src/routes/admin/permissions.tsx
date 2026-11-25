@@ -187,7 +187,8 @@ function PermissionsPage() {
           <Button
             variant="ghost"
             size="icon"
-            className="size-7"
+            className="size-10 sm:size-7"
+            aria-label={m['admin.permissions.edit_title']()}
             onClick={() => openEdit(p)}
           >
             <Pencil className="size-3" />
@@ -195,7 +196,8 @@ function PermissionsPage() {
           <Button
             variant="ghost"
             size="icon"
-            className="size-7"
+            className="size-10 sm:size-7"
+            aria-label={m['admin.permissions.delete_title']()}
             onClick={() => setDeletingPerm(p)}
           >
             <Trash2 className="size-3" />

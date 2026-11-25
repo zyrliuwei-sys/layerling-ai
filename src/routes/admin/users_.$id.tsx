@@ -273,8 +273,8 @@ function UserDetailPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <dl className="grid gap-x-8 md:grid-cols-2">
-            <div className="divide-y">
+          <div className="grid gap-x-8 md:grid-cols-2">
+            <dl className="divide-y">
               <Field label={m['admin.user_detail.referrer']()}>
                 {user.referrer ? (
                   <a
@@ -302,8 +302,8 @@ function UserDetailPage() {
                   )}
                 </Field>
               ))}
-            </div>
-            <div className="divide-y">
+            </dl>
+            <dl className="divide-y">
               <Field label={m['admin.user_detail.ip']()}>
                 {user.ip ? (
                   <span className="font-mono text-xs">{user.ip}</span>
@@ -332,8 +332,8 @@ function UserDetailPage() {
                   </span>
                 )}
               </Field>
-            </div>
-          </dl>
+            </dl>
+          </div>
         </CardContent>
       </Card>
 
@@ -467,7 +467,10 @@ function UserOrders({ userId }: { userId: string }) {
                 value={status}
                 onValueChange={(value) => setStatus(value || 'all')}
               >
-                <SelectTrigger className="h-8 w-[130px]">
+                <SelectTrigger
+                  className="h-10 w-[130px] sm:h-8"
+                  aria-label={m['admin.payments.status']()}
+                >
                   <SelectValue>
                     {(value: string) =>
                       value === 'all'
@@ -491,7 +494,10 @@ function UserOrders({ userId }: { userId: string }) {
                 value={paymentType}
                 onValueChange={(value) => setPaymentType(value || 'all')}
               >
-                <SelectTrigger className="h-8 w-[130px]">
+                <SelectTrigger
+                  className="h-10 w-[130px] sm:h-8"
+                  aria-label={m['admin.payments.type']()}
+                >
                   <SelectValue>
                     {(value: string) => {
                       const type = ORDER_TYPES.find(([v]) => v === value);
@@ -652,7 +658,10 @@ function UserCredits({ userId }: { userId: string }) {
                 value={status}
                 onValueChange={(value) => setStatus(value || 'all')}
               >
-                <SelectTrigger className="h-8 w-[130px]">
+                <SelectTrigger
+                  className="h-10 w-[130px] sm:h-8"
+                  aria-label={m['admin.payments.status']()}
+                >
                   <SelectValue>
                     {(value: string) =>
                       value === 'all'
@@ -676,7 +685,10 @@ function UserCredits({ userId }: { userId: string }) {
                 value={transactionType}
                 onValueChange={(value) => setTransactionType(value || 'all')}
               >
-                <SelectTrigger className="h-8 w-[130px]">
+                <SelectTrigger
+                  className="h-10 w-[130px] sm:h-8"
+                  aria-label={m['admin.payments.type']()}
+                >
                   <SelectValue>
                     {(value: string) =>
                       value === 'all'

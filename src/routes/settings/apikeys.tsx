@@ -163,7 +163,8 @@ function ApiKeysPage() {
             <Button
               variant="ghost"
               size="icon"
-              className="size-7"
+              className="size-10 sm:size-7"
+              aria-label={m['settings.apikeys.copy_key']()}
               onClick={() => handleCopyKey(k.key!)}
             >
               <Copy className="size-3" />
@@ -172,7 +173,8 @@ function ApiKeysPage() {
           <Button
             variant="ghost"
             size="icon"
-            className="size-7"
+            className="size-10 sm:size-7"
+            aria-label={m['settings.apikeys.confirm_delete']()}
             onClick={() => setKeyToDelete(k)}
           >
             <Trash2 className="size-3" />
@@ -265,6 +267,7 @@ function ApiKeysPage() {
               variant="outline"
               size="icon"
               className="shrink-0"
+              aria-label={m['settings.apikeys.copy_key']()}
               onClick={handleCopyCreatedKey}
             >
               {copied ? (

@@ -1,12 +1,16 @@
+import { Link } from '../../core/i18n/navigation';
+import { m } from '../../paraglide/messages.js';
+
 export const meta = {
   title: 'Privacy Policy',
-  description: 'How we collect, use, and protect your personal information.',
-  updated_at: '2026-05-21',
+  description:
+    'How layerling ai handles your account information, saved CAD projects, and design prompts.',
+  updated_at: '2026-11-25',
 };
 
 ## Introduction
 
-We respect your privacy and are committed to protecting your personal data. This Privacy Policy explains how we collect, use, and safeguard your information when you use our service.
+This Privacy Policy explains how layerling ai collects, uses, and safeguards information when you use our online CAD tools to generate, edit, or export 3D-printable models.
 
 ## Information We Collect
 
@@ -17,6 +21,14 @@ We collect the following types of information to provide and improve our service
 3. **Device Information** — Device type, operating system, and browser type, used to optimize compatibility and performance.
 4. **Cookies** — Small data files stored on your device to remember preferences and improve your experience.
 5. **Payment Information** — Billing details handled by trusted third-party payment processors. We do not store full card numbers on our servers.
+
+## CAD Projects and Prompts
+
+Account projects store your project name, model dimensions, saved versions, and update times. Browser projects are stored on the device where you create them. Signing in does not automatically upload a browser project.
+
+If an AI provider is configured and you use AI-assisted editing, Studio sends your prompt and current enclosure parameters to that provider to suggest model changes. Studio tracks account prompt usage to enforce the monthly allowance. Only enter design information you are permitted to share.
+
+The manual Layerling editor is loaded from its own origin and keeps manual projects in that editor's browser storage. Its operator provides a separate privacy policy.
 
 ## How We Use Your Information
 
@@ -50,4 +62,4 @@ We may update this Privacy Policy from time to time. We will notify you of any m
 
 ## Contact Us
 
-If you have questions about this Privacy Policy, please contact us at the email address provided on our website.
+For privacy questions or requests, email <Link href={`mailto:${m['common.support.email']()}`}>{m['common.support.email']()}</Link>.

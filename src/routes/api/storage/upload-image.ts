@@ -6,30 +6,45 @@ import { getAuth } from '@/core/auth';
 import { envConfigs } from '@/config';
 import { getStorage } from '@/modules/storage/service';
 import { md5 } from '@/lib/hash';
+import { matchesRasterFormat, rasterExtension } from '@/lib/raster-upload';
 import { enforceMinIntervalRateLimit } from '@/lib/rate-limit';
 import { respData, respErr } from '@/lib/resp';
-
-// Raster formats only. SVG can carry script and would run on whatever origin
-// serves it, so it is not accepted from users.
-const extFromMime = (mimeType: string) => {
-  const map: Record<string, string> = {
-    'image/jpeg': 'jpg',
-    'image/jpg': 'jpg',
-    'image/png': 'png',
-    'image/webp': 'webp',
-    'image/gif': 'gif',
-    'image/avif': 'avif',
-    'image/heic': 'heic',
-    'image/heif': 'heif',
-  };
-  return map[mimeType] || '';
-};
 
 // Cap for the no-storage local-disk fallback (dev). Configurable via INLINE_IMAGE_MAX_KB.
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 // Per request: bounds memory (formData() buffers the whole body) and storage use.
 const MAX_FILES_PER_REQUEST = 10;
 const MAX_REQUEST_BYTES = 20 * 1024 * 1024;
+
+const MAX_MULTIPART_BYTES = MAX_REQUEST_BYTES + 64 * 1024;
+
+class UploadTooLarge extends Error {}
+
+function readUpload(request: Request) {
+  if (Number(request.headers.get('content-length')) > MAX_MULTIPART_BYTES) {
+    throw new UploadTooLarge();
+  }
+  const contentType = request.headers.get('content-type');
+  if (
+    !request.body ||
+    !contentType?.toLowerCase().startsWith('multipart/form-data;')
+  ) {
+    return null;
+  }
+  let size = 0;
+  const bounded = request.body.pipeThrough(
+    new TransformStream<Uint8Array, Uint8Array>({
+      transform(chunk, controller) {
+        size += chunk.byteLength;
+        if (size > MAX_MULTIPART_BYTES) throw new UploadTooLarge();
+        controller.enqueue(chunk);
+      },
+    })
+  );
+  return new Response(bounded, {
+    headers: { 'content-type': contentType },
+  }).formData();
+}
 
 const INLINE_MAX_BYTES =
   (Number(envConfigs.inline_image_max_kb) || 10240) * 1024;
@@ -54,20 +69,49 @@ async function POST({ request }: { request: Request }) {
     });
     if (userLimited) return userLimited;
 
-    // Refuse oversized bodies before buffering them, when the size is declared.
-    const declared = Number(request.headers.get('content-length') || 0);
-    if (declared > MAX_REQUEST_BYTES + 64 * 1024) {
-      return respErr('Upload is larger than 20MB in total');
+    let formData: FormData | null;
+    try {
+      formData = await readUpload(request);
+    } catch (error) {
+      if (error instanceof UploadTooLarge) {
+        return respErr('Upload is larger than 20MB in total', { status: 413 });
+      }
+      return respErr('Invalid upload body', { status: 400 });
     }
-
-    const formData = await request.formData();
-    const files = formData.getAll('files') as File[];
+    if (!formData)
+      return respErr('A multipart image upload is required', { status: 415 });
+    const files = formData.getAll('files');
     if (!files.length) return respErr('No files provided');
     if (files.length > MAX_FILES_PER_REQUEST) {
       return respErr(`At most ${MAX_FILES_PER_REQUEST} files per upload`);
     }
-    if (files.reduce((sum, f) => sum + f.size, 0) > MAX_REQUEST_BYTES) {
-      return respErr('Upload is larger than 20MB in total');
+
+    const images: Array<{
+      file: File;
+      ext: NonNullable<ReturnType<typeof rasterExtension>>;
+    }> = [];
+    let total = 0;
+    for (const file of files) {
+      if (typeof file === 'string') return respErr('Expected an image file');
+      const ext = rasterExtension(file.type);
+      if (
+        !ext ||
+        !matchesRasterFormat(
+          new Uint8Array(await file.slice(0, 128).arrayBuffer()),
+          ext,
+          file.size
+        )
+      ) {
+        return respErr('Unsupported or invalid image file', { status: 415 });
+      }
+      if (file.size > MAX_UPLOAD_BYTES) {
+        return respErr('An image is larger than 10MB', { status: 413 });
+      }
+      total += file.size;
+      images.push({ file, ext });
+    }
+    if (total > MAX_REQUEST_BYTES) {
+      return respErr('Upload is larger than 20MB in total', { status: 413 });
     }
 
     const storage = await getStorage();
@@ -78,17 +122,7 @@ async function POST({ request }: { request: Request }) {
       deduped: boolean;
     }> = [];
 
-    for (const file of files) {
-      // The extension (and so how the file is served) comes only from this
-      // allow-list — never from the client-supplied file name.
-      const ext = extFromMime(file.type);
-      if (!ext) {
-        return respErr(`File ${file.name} is not a supported image type`);
-      }
-      if (file.size > MAX_UPLOAD_BYTES) {
-        return respErr(`File ${file.name} is larger than 10MB`);
-      }
-
+    for (const { file, ext } of images) {
       const arrayBuffer = await file.arrayBuffer();
       const body = new Uint8Array(arrayBuffer);
 
@@ -101,12 +135,11 @@ async function POST({ request }: { request: Request }) {
       // local URL. Avoids inlining a giant base64 data URL into DB columns (some
       // are varchar(255)). Configure R2 (admin → Storage) for production.
       if (!storage) {
-        // Cloudflare Workers have no writable filesystem — fail clearly
-        // instead of with an opaque fs error.
-        if ((globalThis as any).__CF_ENV__) {
-          return respErr(
-            'Storage is not configured. Set up R2 in Admin → Settings → Storage.'
-          );
+        if (
+          import.meta.env.PROD ||
+          (globalThis as { __CF_ENV__?: unknown }).__CF_ENV__
+        ) {
+          return respErr('Image storage is unavailable', { status: 503 });
         }
         if (body.length > INLINE_MAX_BYTES) {
           const limitKb = Math.round(INLINE_MAX_BYTES / 1024);
@@ -148,7 +181,7 @@ async function POST({ request }: { request: Request }) {
       });
 
       if (!result.success || !result.url) {
-        return respErr(result.error || 'Upload failed');
+        return respErr('Upload failed', { status: 502 });
       }
 
       uploadResults.push({
@@ -163,9 +196,9 @@ async function POST({ request }: { request: Request }) {
       urls: uploadResults.map((r) => r.url),
       results: uploadResults,
     });
-  } catch (e: any) {
-    console.error('upload image failed:', e);
-    return respErr(e?.message || 'upload image failed');
+  } catch {
+    console.error('Image upload failed');
+    return respErr('Upload failed', { status: 500 });
   }
 }
 

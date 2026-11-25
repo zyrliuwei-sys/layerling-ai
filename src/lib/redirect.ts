@@ -28,23 +28,20 @@ export function safeInternalPath(
   input: string | null | undefined
 ): string | null {
   if (!input) return null;
+  const browserOrigin =
+    typeof window === 'undefined' ? undefined : window.location.origin;
+  if (!browserOrigin && !input.startsWith('/')) return null;
 
-  let path = input;
-  if (!path.startsWith('/') || path.startsWith('//')) {
-    const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    if (!origin) return null;
-    try {
-      const url = new URL(path, origin);
-      if (url.origin !== origin) return null;
-      path = url.pathname + url.search + url.hash;
-    } catch {
-      return null;
-    }
+  const origin = browserOrigin ?? 'https://internal.invalid';
+  try {
+    const url = new URL(input, origin);
+    if (url.origin !== origin || url.username || url.password) return null;
+    const pathname = englishPathname(url.pathname);
+    if (pathname.startsWith('//') || AUTH_PATH_RE.test(pathname)) return null;
+    return pathname + url.search + url.hash;
+  } catch {
+    return null;
   }
-
-  // Legacy callback URLs must also canonicalize during client navigation.
-  path = path.replace(/^[^?#]*/, (pathname) => englishPathname(pathname));
-  return AUTH_PATH_RE.test(path) ? null : path;
 }
 
 // Schemes that execute or embed rather than hand off to an installed app.

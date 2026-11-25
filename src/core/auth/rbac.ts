@@ -1,3 +1,5 @@
+export const ADMIN_ACCESS_PERMISSION = 'admin.access';
+
 export const ROLES = {
   SUPER_ADMIN: 'super_admin',
   ADMIN: 'admin',

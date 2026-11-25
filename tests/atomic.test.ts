@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, before, test } from 'node:test';
@@ -63,8 +63,25 @@ if (useD1) {
   ).rows.map((r) => String(r.sql));
   sqlite.close();
   const { getPlatformProxy } = await import('wrangler');
+  const configPath = join(directory, 'wrangler.json');
+  await writeFile(
+    configPath,
+    JSON.stringify({
+      name: 'atomic-test',
+      compatibility_date: '2025-01-01',
+      d1_databases: [
+        {
+          binding: 'DB',
+          database_name: 'atomic-test',
+          database_id: '00000000-0000-0000-0000-000000000001',
+          remote: false,
+        },
+      ],
+    })
+  );
   const proxy = await getPlatformProxy<{ DB: any }>({
-    configPath: 'wrangler.jsonc',
+    configPath,
+    envFiles: [],
     persist: { path: join(directory, 'd1') },
   });
   for (const statement of ddl) await proxy.env.DB.prepare(statement).run();
@@ -128,21 +145,19 @@ async function grantCredits(userId: string, credits: number) {
 }
 async function createdOrder(userId: string, creditsAmount = 100) {
   const orderNo = id('ORD');
-  await db()
-    .insert(schema.order)
-    .values({
-      id: orderNo,
-      orderNo,
-      userId,
-      status: 'created',
-      amount: 500,
-      currency: 'usd',
-      paymentProvider: 'stripe',
-      paymentSessionId: orderNo,
-      checkoutInfo: '{}',
-      paymentType: 'one-time',
-      creditsAmount,
-    });
+  await db().insert(schema.order).values({
+    id: orderNo,
+    orderNo,
+    userId,
+    status: 'created',
+    amount: 500,
+    currency: 'usd',
+    paymentProvider: 'stripe',
+    paymentSessionId: orderNo,
+    checkoutInfo: '{}',
+    paymentType: 'one-time',
+    creditsAmount,
+  });
   const [row] = await db()
     .select()
     .from(schema.order)
@@ -191,18 +206,16 @@ for (const mode of MODES) {
           .update(schema.order)
           .set({ status: 'paid' })
           .where(eq(schema.order.id, order.id)),
-        q
-          .insert(schema.credit)
-          .values({
-            id: dupId,
-            userId: u,
-            transactionNo: id('t'),
-            transactionType: 'grant',
-            transactionScene: 'gift',
-            credits: 1,
-            remainingCredits: 1,
-            status: 'active',
-          }),
+        q.insert(schema.credit).values({
+          id: dupId,
+          userId: u,
+          transactionNo: id('t'),
+          transactionType: 'grant',
+          transactionScene: 'gift',
+          credits: 1,
+          remainingCredits: 1,
+          status: 'active',
+        }),
       ])
     );
     const [row] = await db()

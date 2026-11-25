@@ -9,6 +9,7 @@ import {
   sanitizeUtm,
 } from './lib/cookie';
 import { redirectChineseEdition } from './lib/english-only';
+import { respErr } from './lib/resp';
 import { paraglideMiddleware } from './paraglide/server.js';
 
 // On Cloudflare Workers, stash the binding env (D1, ASSETS, …) on globalThis
@@ -19,11 +20,54 @@ import { paraglideMiddleware } from './paraglide/server.js';
 const CF_WORKERS_MODULE = 'cloudflare:workers';
 let cfEnvPromise: Promise<void> | null = null;
 
+const runtime = globalThis as typeof globalThis & {
+  __CF_ENV__?: Record<string, unknown>;
+  __DEV_D1_READY__?: Promise<void>;
+};
+
+async function connectDevD1() {
+  // Wrangler runs in the Node SSR worker and stays out of the deploy bundle.
+  const wranglerModule = 'wrangler';
+  const { getPlatformProxy, unstable_readConfig } = (await import(
+    /* @vite-ignore */ wranglerModule
+  )) as typeof import('wrangler');
+  const configPath = './wrangler.jsonc';
+  const config = unstable_readConfig({ config: configPath });
+  if (
+    !config.d1_databases.some(
+      ({ binding, remote }: { binding: string; remote?: boolean }) =>
+        binding === 'DB' && remote
+    )
+  ) {
+    throw new Error(
+      'Set remote: true on the DB binding in wrangler.jsonc for local D1 development.'
+    );
+  }
+
+  const platform = await getPlatformProxy({
+    configPath,
+    envFiles: [],
+    persist: false,
+  });
+  runtime.__CF_ENV__ = platform.env;
+  process.once('SIGTERM', () => {
+    void platform.dispose().finally(() => process.exit(0));
+  });
+}
+
 function ensureCloudflareEnv(): Promise<void> {
+  if (import.meta.env.DEV && envConfigs.database_provider === 'd1') {
+    // Keep the binding alive across source reloads so cached DB clients can use it.
+    return (runtime.__DEV_D1_READY__ ??= connectDevD1().catch((error) => {
+      delete runtime.__DEV_D1_READY__;
+      throw error;
+    }));
+  }
+
   if (!cfEnvPromise) {
     cfEnvPromise = import(/* @vite-ignore */ CF_WORKERS_MODULE)
       .then((mod) => {
-        (globalThis as any).__CF_ENV__ = mod.env;
+        runtime.__CF_ENV__ = mod.env;
         ensureDefaultUserAgent();
       })
       .catch(() => {
@@ -85,27 +129,117 @@ function withMutableHeaders(response: Response): Response {
   }
 }
 
+function inRoute(path: string, prefix: string) {
+  return path === prefix || path.startsWith(`${prefix}/`);
+}
+
+const accountPages = new Set([
+  '/auth-callback',
+  '/forgot-password',
+  '/projects',
+  '/redeem-invite',
+  '/reset-password',
+  '/sign-in',
+  '/sign-up',
+  '/verify-email',
+]);
+
+function addResponsePolicies(response: Response, url: URL) {
+  const headers = response.headers;
+  const path = url.pathname.replace(/\/+$/, '') || '/';
+  const privatePage =
+    accountPages.has(path) ||
+    inRoute(path, '/settings') ||
+    inRoute(path, '/admin');
+  const privatePreview =
+    (inRoute(path, '/blog') && url.searchParams.has('preview')) ||
+    (path === '/studio' &&
+      (url.searchParams.has('project') || url.searchParams.has('prompt')));
+
+  headers.set('X-Content-Type-Options', 'nosniff');
+  headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  if (url.protocol === 'https:') {
+    headers.set('Strict-Transport-Security', 'max-age=31536000');
+  }
+  if (privatePage || privatePreview || response.status >= 400) {
+    headers.set('X-Robots-Tag', 'noindex');
+  }
+  if (
+    privatePage ||
+    privatePreview ||
+    ['/api/admin', '/api/auth', '/api/cad', '/api/user'].some((prefix) =>
+      inRoute(path, prefix)
+    )
+  ) {
+    headers.set('Cache-Control', 'private, no-store');
+  }
+  if (
+    path === '/auth-callback' ||
+    path === '/reset-password' ||
+    path === '/verify-email'
+  ) {
+    headers.set('Referrer-Policy', 'no-referrer');
+  }
+  if (privatePage && import.meta.env.PROD) {
+    headers.set('X-Frame-Options', 'DENY');
+    headers.set('Content-Security-Policy', "frame-ancestors 'none'");
+  }
+  return response;
+}
+
+function hasForeignBrowserWrite(request: Request, { pathname, origin }: URL) {
+  if (
+    !pathname.startsWith('/api/') ||
+    ['GET', 'HEAD', 'OPTIONS'].includes(request.method) ||
+    !request.headers.has('cookie') ||
+    inRoute(pathname, '/api/auth') ||
+    inRoute(pathname, '/api/payment/notify')
+  )
+    return false;
+
+  const source = request.headers.get('origin');
+  const fetchSite = request.headers.get('Sec-Fetch-Site');
+  if (fetchSite === 'cross-site' || fetchSite === 'same-site') return true;
+  return source !== null && source !== origin && source !== appOrigin();
+}
+
+function appOrigin() {
+  try {
+    return new URL(envConfigs.app_url).origin;
+  } catch {
+    return '';
+  }
+}
+
 // Custom server entry — wraps every request in a db scope (one db client per
 // request on Workers, see core/db/request-scope.ts) and Paraglide's middleware
 // so getLocale() resolves per-request (AsyncLocalStorage) during SSR.
 export default {
   async fetch(req: Request): Promise<Response> {
+    const url = new URL(req.url);
     const redirect = redirectChineseEdition(req);
-    if (redirect) return withMutableHeaders(redirect);
+    if (redirect) return addResponsePolicies(withMutableHeaders(redirect), url);
+    if (hasForeignBrowserWrite(req, url)) {
+      return addResponsePolicies(
+        respErr('Same-origin request required', { status: 403 }),
+        url
+      );
+    }
     await ensureCloudflareEnv();
     // Wrap the whole request so anything before/after the handler shares
     // the same db client too.
-    return runWithDbScope(() => handleRequest(req));
+    return runWithDbScope(() => handleRequest(req, url));
   },
 };
 
-async function handleRequest(req: Request): Promise<Response> {
+async function handleRequest(req: Request, url: URL): Promise<Response> {
   const response = withMutableHeaders(
     await paraglideMiddleware(req, () => handler.fetch(req))
   );
   // First-touch attribution: remember UTM params for 30 days so sign-up can
   // stamp them onto the user row. Never overwrite an existing cookie.
-  const params = new URL(req.url).searchParams;
+  const params = url.searchParams;
+  const cookieAttributes = `${ATTRIBUTION_COOKIE_ATTRS}${url.protocol === 'https:' ? '; Secure' : ''}`;
   const cookieHeader = req.headers.get('cookie');
   for (const key of UTM_COOKIE_KEYS) {
     const value = params.get(key);
@@ -114,7 +248,7 @@ async function handleRequest(req: Request): Promise<Response> {
     if (sanitized) {
       response.headers.append(
         'Set-Cookie',
-        `${key}=${encodeURIComponent(sanitized)}; ${ATTRIBUTION_COOKIE_ATTRS}`
+        `${key}=${encodeURIComponent(sanitized)}; ${cookieAttributes}`
       );
     }
   }
@@ -127,16 +261,13 @@ async function handleRequest(req: Request): Promise<Response> {
     (req.headers.get('accept') || '').includes('text/html') &&
     !getCookieFromHeader(cookieHeader, REFERRER_COOKIE)
   ) {
-    const sanitized = sanitizeReferrer(referer, [
-      new URL(req.url).host,
-      appHost(),
-    ]);
+    const sanitized = sanitizeReferrer(referer, [url.host, appHost()]);
     if (sanitized) {
       response.headers.append(
         'Set-Cookie',
-        `${REFERRER_COOKIE}=${encodeURIComponent(sanitized)}; ${ATTRIBUTION_COOKIE_ATTRS}`
+        `${REFERRER_COOKIE}=${encodeURIComponent(sanitized)}; ${cookieAttributes}`
       );
     }
   }
-  return response;
+  return addResponsePolicies(response, url);
 }

@@ -385,6 +385,7 @@ function GuestPostEditorPage() {
               </span>
             </div>
             <RichTextEditor
+              label={m['guest_posts.field_content']()}
               value={content}
               onChange={setContent}
               placeholder={m['guest_posts.content_placeholder']()}

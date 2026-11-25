@@ -530,7 +530,7 @@ function SettingField({
       <div className="space-y-2">
         <Label htmlFor={setting.name}>{label}</Label>
         <Select value={value} onValueChange={(v) => onChange(v || '')}>
-          <SelectTrigger>
+          <SelectTrigger id={setting.name}>
             <SelectValue placeholder={placeholder || 'Select...'} />
           </SelectTrigger>
           <SelectContent>

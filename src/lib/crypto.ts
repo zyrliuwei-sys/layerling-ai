@@ -8,9 +8,9 @@
  * Plain values (no prefix) pass through decryptSecret unchanged, so legacy
  * plaintext rows keep working and get encrypted on their next save.
  *
- * Key source: CONFIG_ENCRYPTION_KEY env var. When unset, encryption is
- * disabled entirely — values are stored as plaintext (the original behavior).
- * Already-encrypted rows still decrypt as long as the key stays configured.
+ * CONFIG_ENCRYPTION_KEY is required for new secret writes in production.
+ * Local development can use plaintext. Keep the production key stable to
+ * preserve access to existing encrypted rows.
  *
  * This protects against database-only compromise (leaked backups, SQL
  * injection dumps). It does NOT protect against a compromised app server —
@@ -55,14 +55,20 @@ export function isEncryptedSecret(value: string): boolean {
 }
 
 /**
- * Encrypt a secret for storage. Returns the value unchanged (plaintext) when
- * it's empty, already encrypted, or CONFIG_ENCRYPTION_KEY is not configured.
+ * Encrypt a secret for storage. Empty and already encrypted values pass through.
  */
 export async function encryptSecret(plain: string): Promise<string> {
   if (!plain || isEncryptedSecret(plain)) return plain;
 
   const secret = getEncryptionSecret();
-  if (!secret) return plain;
+  if (!secret) {
+    if (import.meta.env?.PROD || process.env.NODE_ENV === 'production') {
+      throw new Error(
+        'CONFIG_ENCRYPTION_KEY is required to save secrets in production'
+      );
+    }
+    return plain;
+  }
 
   const key = await deriveKey(secret);
   const iv = crypto.getRandomValues(new Uint8Array(IV_LENGTH));

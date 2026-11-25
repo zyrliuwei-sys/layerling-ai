@@ -240,7 +240,10 @@ function PaymentsPage() {
                 value={status}
                 onValueChange={(value) => setStatus(value || 'all')}
               >
-                <SelectTrigger className="h-9 w-[140px]">
+                <SelectTrigger
+                  className="h-10 w-[140px] sm:h-9"
+                  aria-label={m['settings.payments.status']()}
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

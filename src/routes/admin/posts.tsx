@@ -236,7 +236,8 @@ function PostsPage() {
           <Button
             variant="ghost"
             size="icon"
-            className="size-7"
+            className="size-10 sm:size-7"
+            aria-label={m['admin.posts.edit_title']()}
             onClick={() => openEdit(p)}
           >
             <Pencil className="size-3" />
@@ -244,7 +245,8 @@ function PostsPage() {
           <Button
             variant="ghost"
             size="icon"
-            className="size-7"
+            className="size-10 sm:size-7"
+            aria-label={m['admin.posts.delete_title']()}
             onClick={() => setDeletingPost(p)}
           >
             <Trash2 className="size-3" />
@@ -301,7 +303,7 @@ function PostsPage() {
                 value={field.state.value || ''}
                 onValueChange={(v) => field.handleChange(v || '')}
               >
-                <SelectTrigger>
+                <SelectTrigger aria-label={m['admin.posts.category_field']()}>
                   <SelectValue
                     placeholder={m['admin.posts.category_placeholder']()}
                   />
@@ -325,7 +327,7 @@ function PostsPage() {
                 value={field.state.value || 'draft'}
                 onValueChange={(v) => field.handleChange(v || 'draft')}
               >
-                <SelectTrigger>
+                <SelectTrigger aria-label={m['admin.posts.status_field']()}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -345,6 +347,7 @@ function PostsPage() {
             <div className="space-y-2">
               <Label>{m['admin.posts.content_field']()}</Label>
               <RichTextEditor
+                label={m['admin.posts.content_field']()}
                 value={field.state.value}
                 onChange={(content) => field.handleChange(content)}
                 placeholder={m['admin.posts.content_placeholder']()}

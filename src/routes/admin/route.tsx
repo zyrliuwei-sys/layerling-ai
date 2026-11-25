@@ -12,7 +12,7 @@ import {
   Shield,
 } from 'lucide-react';
 
-import { matchPermission } from '@/core/auth/rbac';
+import { ADMIN_ACCESS_PERMISSION, matchPermission } from '@/core/auth/rbac';
 import { envConfigs } from '@/config';
 import { m } from '@/paraglide/messages.js';
 import { useUserPermissions } from '@/hooks/use-user-permissions';
@@ -121,7 +121,7 @@ function AdminLayout() {
       logo={envConfigs.app_logo}
       brandHref="/admin"
       profileHref="/settings/profile"
-      requirePermission="admin.*"
+      requirePermission={ADMIN_ACCESS_PERMISSION}
     >
       <Outlet />
     </AppLayout>

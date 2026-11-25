@@ -4,6 +4,14 @@ A headless SaaS engine for building AI-powered products with Claude Code, on
 TanStack Start. Pre-wired business logic (payments, credits, subscriptions,
 auth, RBAC, i18n, CMS) with minimal UI — you build your product pages on top.
 
+## Layerling AI workspace
+
+- `/studio` builds editable enclosure parameters into solids in a browser worker using OpenCascade via `occt-wasm`, the CAD kernel used by Layerling. Signed-out visitors can use guided prompts and browser project storage. Accounts add private cloud projects and a free monthly allowance for AI-assisted prompts. Guided editing remains available. STL and 3MF exports place the body and lid side by side for printing.
+- `/editor` loads the live [Layerling editor](https://github.com/henmedia/layerling) in a sandboxed frame. Layerling's source and its `AGPL-3.0-only` license are linked from that page. For an independently hosted copy, serve an upstream static export at the root of its own origin and set `VITE_LAYERLING_EDITOR_URL` before building. A localhost HTTP origin is accepted for development.
+- In Admin → Settings, enter the OpenAI key to enable AI prompts. Guided enclosure prompts work without a provider. Google sign-in uses this project's existing provider settings.
+
+Run `pnpm test:cad` to check geometry, print formats, project ownership, and monthly quotas.
+
 ## Quick Start
 
 ```bash
@@ -88,8 +96,8 @@ The admin panel (`/admin`):
 | Agent    | Agent accounts, tokens and audit log                                                        |
 | Settings | General, Users, Auth, Payment, Email, Storage, AI, Analytics, Ads, Customer Service, Notify |
 
-Provider credentials live in admin Settings (encrypted at rest when
-`CONFIG_ENCRYPTION_KEY` is set), not in env files.
+Provider credentials are saved in admin Settings. In production, saving secrets
+requires `CONFIG_ENCRYPTION_KEY` in the server environment.
 
 ## Commands
 
@@ -136,12 +144,12 @@ VITE_APP_NAME=My App
 DATABASE_PROVIDER=sqlite        # sqlite | postgres | mysql | turso | d1
 DATABASE_URL=file:data/local.db
 AUTH_SECRET=generate-with-openssl-rand-base64-32
+CONFIG_ENCRYPTION_KEY=          # required to save production secrets or issue API keys
 
 # Optional
 VITE_APP_DESCRIPTION=
 VITE_APP_LOGO=/logo.svg
 VITE_DEFAULT_LOCALE=en
-CONFIG_ENCRYPTION_KEY=          # encrypts secrets saved in admin Settings
 ```
 
 See [.env.example](./.env.example) for the full list.

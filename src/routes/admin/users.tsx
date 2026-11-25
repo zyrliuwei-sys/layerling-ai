@@ -377,8 +377,13 @@ function UsersPage() {
         <DropdownMenu>
           <DropdownMenuTrigger
             render={
-              <Button variant="ghost" size="icon" className="size-7">
-                <MoreHorizontal className="size-4" />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-10 sm:size-8"
+                aria-label={m['admin.users.user_actions']({ name: u.name })}
+              >
+                <MoreHorizontal className="size-4" aria-hidden="true" />
               </Button>
             }
           />
@@ -444,6 +449,7 @@ function UsersPage() {
                 }
               >
                 <SelectTrigger
+                  aria-label={m['admin.users.source_col']()}
                   className={cn(
                     'h-9 max-w-60',
                     source !== undefined && 'border-primary'

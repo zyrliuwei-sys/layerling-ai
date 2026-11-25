@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 FROM node:22-alpine AS base
 
 # Install dependencies only when needed
@@ -10,7 +11,7 @@ WORKDIR /app
 
 # Copy package manifests, build config, and ALL dialect templates so the
 # postinstall hook can stamp out a matching schema.ts during install.
-COPY package.json pnpm-lock.yaml* vite.config.ts ./
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml vite.config.ts ./
 COPY scripts/db-setup.mjs scripts/db-setup.mjs
 COPY src/config/db/schema.sqlite.ts src/config/db/schema.sqlite.ts
 COPY src/config/db/schema.postgres.ts src/config/db/schema.postgres.ts
@@ -29,11 +30,11 @@ FROM deps AS builder
 
 WORKDIR /app
 
-# NODE_ENV=production so loadEnvFiles() in vite.config.ts reads .env.production
+# Vite reads optional build-time settings from the BuildKit-mounted file.
 ENV NODE_ENV=production
 
 COPY . .
-RUN pnpm build
+RUN --mount=type=secret,id=production_env,target=/app/.env.production pnpm build
 
 # Production image — run the nitro server output
 FROM base AS runner

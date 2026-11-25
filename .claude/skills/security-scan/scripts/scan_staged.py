@@ -20,6 +20,7 @@ import argparse
 import re
 import subprocess
 import sys
+from fnmatch import fnmatchcase
 from pathlib import Path
 
 # ---------------------------------------------------------------- helpers
@@ -27,7 +28,7 @@ from pathlib import Path
 
 def git(*args: str) -> str:
     result = subprocess.run(
-        ["git", *args], capture_output=True, text=True, check=False
+        ["git", "-c", "core.quotePath=false", *args], capture_output=True, text=True, check=False
     )
     if result.returncode != 0 and args[0] not in ("check-ignore",):
         raise RuntimeError(f"git {' '.join(args)} failed: {result.stderr.strip()}")
@@ -46,7 +47,7 @@ def add(level: str, location: str, message: str) -> None:
 # (pattern, message) — matched against the full repo-relative path
 FORBIDDEN_FILES = [
     (r"(^|/)\.env(\..+)?$", "env file — likely contains real credentials"),
-    (r"\.(pem|p12|pfx|keystore|jks)$", "certificate / private key material"),
+    (r"\.(pem|key|p12|pfx|keystore|jks)$", "certificate / private key material"),
     (r"(^|/)id_(rsa|ed25519|ecdsa)(\.pub)?$", "SSH key"),
     (r"(^|/)(credentials|service[-_]?account)[^/]*\.json$", "cloud credentials file"),
     (r"\.(db|sqlite|sqlite3)(-(journal|wal|shm))?$", "database file"),
@@ -74,6 +75,8 @@ def check_staged_filenames(files: list[str]) -> None:
 HIGH_CONFIDENCE = [
     (r"AKIA[0-9A-Z]{16}", "AWS access key ID"),
     (r"gh[pousr]_[A-Za-z0-9]{36,}", "GitHub token"),
+    (r"github_pat_[A-Za-z0-9_]{40,}", "GitHub fine-grained token"),
+    (r"sk-(?:proj|svcacct)-[A-Za-z0-9_-]{35,}", "OpenAI project or service account key"),
     (r"sk-ant-[A-Za-z0-9_-]{20,}", "Anthropic API key"),
     (r"sk-[A-Za-z0-9]{20}T3BlbkFJ[A-Za-z0-9]{20}", "OpenAI API key"),
     (r"sk_live_[A-Za-z0-9]{20,}", "Stripe live secret key"),
@@ -135,7 +138,7 @@ def check_secrets(diff_text: str) -> None:
         loc = f"{file}:{line_no}"
         for pattern, msg in HIGH_CONFIDENCE:
             if re.search(pattern, content):
-                add("HIGH", loc, f"{msg} in diff: {content.strip()[:80]}")
+                add("HIGH", loc, f"{msg} in diff (value redacted)")
                 break
         else:
             if GENERIC_SKIP_FILES.search(file):
@@ -143,7 +146,7 @@ def check_secrets(diff_text: str) -> None:
             for pattern, msg in GENERIC:
                 m = re.search(pattern, content)
                 if m and not PLACEHOLDER.search(content):
-                    add("MEDIUM", loc, f"{msg}: {content.strip()[:80]}")
+                    add("MEDIUM", loc, f"{msg} (value redacted)")
                     break
 
 
@@ -161,6 +164,10 @@ IGNORE_PROBES = [
     ("src/paraglide/runtime.js", "MEDIUM"),
     ("src/routeTree.gen.ts", "MEDIUM"),
     ("data/local.db", "HIGH"),
+    ("private/credentials.json", "HIGH"),
+    ("private/deploy.key", "HIGH"),
+    ("private/data.sqlite3-wal", "HIGH"),
+    ("public/uploads/image.png", "MEDIUM"),
     (".DS_Store", "LOW"),
     ("npm-debug.log", "LOW"),
 ]
@@ -179,7 +186,7 @@ def check_gitignore_coverage() -> None:
 
 
 def check_tracked_files() -> None:
-    tracked = git("ls-files").splitlines()
+    tracked = git("ls-files", "-z").split("\0")
     for f in tracked:
         if FORBIDDEN_EXCEPTIONS.search(f):
             continue
@@ -191,28 +198,31 @@ def check_tracked_files() -> None:
 
 # ------------------------------------------------------- 5. dockerignore
 
-DOCKERIGNORE_REQUIRED = [".env", ".git", "node_modules"]
+DOCKERIGNORE_PROBES = [
+    ".env", ".env.local", ".env.development", ".env.production",
+    ".env.production.local", ".git", "node_modules", "public/uploads",
+]
 
 
 def check_dockerignore(repo_root: Path) -> None:
-    dockerfiles = list(repo_root.glob("Dockerfile*")) + list(
-        repo_root.glob("**/Dockerfile")
-    )
-    dockerfiles = [d for d in dockerfiles if "node_modules" not in str(d)]
-    if not dockerfiles:
+    if not any(repo_root.glob("Dockerfile*")):
         return
-    di = repo_root / ".dockerignore"
-    if not di.exists():
+    ignore_file = repo_root / ".dockerignore"
+    if not ignore_file.exists():
         add("HIGH", ".dockerignore", "Dockerfile exists but .dockerignore is missing")
         return
-    content = di.read_text()
-    for req in DOCKERIGNORE_REQUIRED:
-        if not any(
-            line.strip().startswith(req)
-            for line in content.splitlines()
-            if line.strip() and not line.strip().startswith("#")
-        ):
-            add("MEDIUM", ".dockerignore", f"missing `{req}` entry")
+    rules = [line.strip() for line in ignore_file.read_text().splitlines()]
+    for probe in DOCKERIGNORE_PROBES:
+        ignored = False
+        for rule in rules:
+            if not rule or rule.startswith("#"):
+                continue
+            pattern = rule.removeprefix("!").strip("/").removeprefix("**/")
+            if fnmatchcase(probe, pattern):
+                ignored = not rule.startswith("!")
+        if not ignored:
+            level = "HIGH" if probe.startswith(".env") else "MEDIUM"
+            add(level, ".dockerignore", f"build context includes `{probe}`")
 
 
 # ------------------------------------------------------- 6. oversized files
@@ -246,11 +256,12 @@ def main() -> int:
         return 2
 
     if args.worktree:
-        files = git("diff", "HEAD", "--name-only").splitlines()
-        files += git("ls-files", "--others", "--exclude-standard").splitlines()
+        files = git("diff", "HEAD", "--name-only", "-z").split("\0")
+        untracked = git("ls-files", "--others", "--exclude-standard", "-z").split("\0")
+        files += untracked
         diff_text = git("diff", "HEAD", "--unified=0", "--no-color")
         # include untracked file contents as fully-added diffs
-        for f in git("ls-files", "--others", "--exclude-standard").splitlines():
+        for f in filter(None, untracked):
             p = repo_root / f
             try:
                 lines = p.read_text(errors="ignore").splitlines()
@@ -259,7 +270,7 @@ def main() -> int:
             diff_text += f"\n+++ b/{f}\n@@ -0,0 +1 @@\n"
             diff_text += "\n".join("+" + l for l in lines)
     else:
-        files = git("diff", "--cached", "--name-only").splitlines()
+        files = git("diff", "--cached", "--name-only", "-z").split("\0")
         diff_text = git("diff", "--cached", "--unified=0", "--no-color")
 
     files = sorted(set(f for f in files if f))

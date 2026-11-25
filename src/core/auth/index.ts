@@ -231,7 +231,8 @@ export function getAuth(configs?: Record<string, string>) {
         const origin = request?.headers?.get?.('origin');
         if (origin) {
           const host = new URL(origin).hostname;
-          if (host === 'localhost') origins.push(origin);
+          if (host === 'localhost' && process.env.NODE_ENV !== 'production')
+            origins.push(origin);
           const suffixMatched = extra.some(
             (rule) =>
               rule.startsWith('.') &&

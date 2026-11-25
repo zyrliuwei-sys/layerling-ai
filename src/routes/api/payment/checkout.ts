@@ -2,12 +2,13 @@ import { createFileRoute } from '@tanstack/react-router';
 import { resolveCharge } from '@/server/payment/charge';
 
 import { getAuth } from '@/core/auth';
-import { getPricingProduct } from '@/config/pricing';
+import { getPricingProduct, publicCheckoutEnabled } from '@/config/pricing';
 import { getAllConfigs } from '@/modules/config/service';
 import { createCheckout } from '@/modules/payment/service';
 import { localizedPath } from '@/lib/locale-path';
 import { enforceMinIntervalRateLimit } from '@/lib/rate-limit';
 import { respData, respErr } from '@/lib/resp';
+import { m } from '@/paraglide/messages.js';
 
 function safeSameOriginPath(
   input: string | undefined | null,
@@ -26,6 +27,10 @@ function safeSameOriginPath(
 }
 
 async function POST({ request }: { request: Request }) {
+  if (!publicCheckoutEnabled) {
+    return respErr(m['cad.api.checkout_disabled'](), { status: 410 });
+  }
+
   const limited = enforceMinIntervalRateLimit(request, {
     intervalMs: 1000,
     keyPrefix: 'checkout',

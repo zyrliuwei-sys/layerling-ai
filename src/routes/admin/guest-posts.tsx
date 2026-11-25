@@ -512,6 +512,7 @@ function ReviewPanel({
         <div className="space-y-2">
           <Label>{m['guest_posts.field_content']()}</Label>
           <RichTextEditor
+            label={m['guest_posts.field_content']()}
             value={draft.content}
             onChange={(c) => setDraft((d) => d && { ...d, content: c })}
           />

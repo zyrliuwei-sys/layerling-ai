@@ -76,7 +76,7 @@ function ToolbarButton({
       type="button"
       variant={active ? 'secondary' : 'ghost'}
       size="icon"
-      className="size-8"
+      className="size-10 sm:size-8"
       onClick={onClick}
       disabled={disabled}
       aria-label={label}
@@ -238,6 +238,7 @@ export function RichTextEditor({
   value,
   onChange,
   placeholder,
+  label,
   className,
 }: {
   /** markdown in */
@@ -245,6 +246,7 @@ export function RichTextEditor({
   /** markdown out */
   onChange: (markdown: string) => void;
   placeholder?: string;
+  label: string;
   className?: string;
 }) {
   // Tracks the markdown this editor last emitted, so external value updates
@@ -267,6 +269,8 @@ export function RichTextEditor({
     immediatelyRender: false,
     editorProps: {
       attributes: {
+        'aria-label': label,
+        'aria-multiline': 'true',
         class: cn(
           markdownStyles,
           'min-h-[280px] max-w-none p-4 focus:outline-none'

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
+import { useSession } from '@/core/auth/client';
 import { apiGet } from '@/lib/api-client';
 
 export interface UserPermissions {
@@ -7,13 +8,15 @@ export interface UserPermissions {
   permissions?: string[];
 }
 
-// Current user's permission summary — shared by site-user-menu and
-// app-layout (single network call, react-query dedupes).
+// Share the permission summary across the current account's navigation and layouts.
 export function useUserPermissions(enabled = true) {
+  const { data: session } = useSession();
+  const userId = session?.user?.id;
+
   return useQuery({
-    queryKey: ['user-permissions'],
+    queryKey: ['user-permissions', userId],
     queryFn: () => apiGet<UserPermissions>('/api/user/permissions'),
     staleTime: 5 * 60_000,
-    enabled,
+    enabled: enabled && Boolean(userId),
   });
 }

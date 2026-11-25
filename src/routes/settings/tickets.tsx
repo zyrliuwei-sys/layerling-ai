@@ -278,7 +278,8 @@ function TicketsPage() {
         <Button
           variant="ghost"
           size="icon"
-          className="size-7"
+          className="size-10 sm:size-7"
+          aria-label={m['common.table.view_details']()}
           onClick={() => openDetail(r)}
         >
           <MessageSquare className="size-4" />
@@ -324,7 +325,10 @@ function TicketsPage() {
                   setStatus((value as TicketStatus) || 'all')
                 }
               >
-                <SelectTrigger className="h-9 w-[130px]">
+                <SelectTrigger
+                  className="h-10 w-[130px] sm:h-9"
+                  aria-label={m['settings.tickets.status_col']()}
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

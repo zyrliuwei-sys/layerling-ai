@@ -211,7 +211,7 @@ export function AgentAccounts({ onConnect }: { onConnect?: () => void }) {
             {m['admin.agent.accounts_hint']()}{' '}
             <Link
               href="/admin/roles"
-              className="text-primary underline-offset-4 hover:underline"
+              className="text-primary underline underline-offset-4"
             >
               {m['admin.agent.manage_roles']()}
             </Link>
@@ -464,7 +464,10 @@ export function AgentAccounts({ onConnect }: { onConnect?: () => void }) {
                   value={expiryDays}
                   onValueChange={(v) => v && setExpiryDays(String(v))}
                 >
-                  <SelectTrigger className="w-32">
+                  <SelectTrigger
+                    aria-label={m['admin.agent.token_expires']()}
+                    className="h-10 w-32 sm:h-9"
+                  >
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

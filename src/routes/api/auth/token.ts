@@ -1,55 +1,59 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import { getAuth, getAuthCookiePrefix } from '@/core/auth';
+import { getConfig } from '@/modules/config/service';
+import { getCookieFromHeader } from '@/lib/cookie';
+import { isAllowedAppProtocolUrl } from '@/lib/redirect';
 import { respData, respErr } from '@/lib/resp';
+import { serverSiteOrigin } from '@/lib/site-origin';
 
-function parseCookies(header: string | null): Record<string, string> {
-  const out: Record<string, string> = {};
-  if (!header) return out;
-  for (const part of header.split(';')) {
-    const idx = part.indexOf('=');
-    if (idx === -1) continue;
-    const name = part.slice(0, idx).trim();
-    const value = part.slice(idx + 1).trim();
-    if (name) out[name] = decodeURIComponent(value);
+async function POST({ request }: { request: Request }) {
+  const url = new URL(request.url);
+  const origin = request.headers.get('origin');
+  if (!origin || (origin !== url.origin && origin !== serverSiteOrigin())) {
+    return respErr('Same-origin request required', { status: 403 });
   }
-  return out;
-}
 
-/**
- * GET /api/auth/token
- *
- * Returns the current session token for the logged-in user.
- * Used by the auth-callback page to pass the token to the desktop client
- * via custom protocol URL (her://auth/callback?token=xxx).
- */
-async function GET({ request }: { request: Request }) {
   try {
-    const auth = getAuth();
-    const session = await auth.api.getSession({ headers: request.headers });
-    if (!session?.user) {
-      return respErr('Unauthorized');
+    const target = url.searchParams.get('redirect');
+    const allowedSchemes = await getConfig('desktop_auth_schemes');
+    if (
+      !target ||
+      target.length > 2048 ||
+      !isAllowedAppProtocolUrl(target, allowedSchemes)
+    ) {
+      return respErr('Desktop sign-in is unavailable for this destination', {
+        status: 403,
+      });
     }
 
-    const cookies = parseCookies(request.headers.get('cookie'));
-    // Cookie name varies: __Secure- prefix when using HTTPS
-    const baseName = `${getAuthCookiePrefix()}.session_token`;
-    const cookieName =
-      `__Secure-${baseName}` in cookies ? `__Secure-${baseName}` : baseName;
-    const token = cookies[cookieName];
+    const session = await getAuth().api.getSession({
+      headers: request.headers,
+    });
+    if (!session?.user) return respErr('Unauthorized', { status: 401 });
 
-    if (!token) {
-      return respErr('No session token found');
-    }
+    const cookies = request.headers.get('cookie');
+    const name = `${getAuthCookiePrefix()}.session_token`;
+    const token =
+      getCookieFromHeader(cookies, `__Secure-${name}`) ??
+      getCookieFromHeader(cookies, name);
+    if (!token) return respErr('No session token found', { status: 401 });
 
-    return respData({ token, cookieName });
-  } catch (error: any) {
-    return respErr(error.message || 'Internal error');
+    return respData({ token: decodeURIComponent(token) });
+  } catch {
+    return respErr('Desktop sign-in is unavailable', { status: 500 });
   }
 }
 
 export const Route = createFileRoute('/api/auth/token')({
   server: {
-    handlers: { GET },
+    handlers: {
+      GET: () =>
+        respErr('Method not allowed', {
+          status: 405,
+          headers: { Allow: 'POST' },
+        }),
+      POST,
+    },
   },
 });

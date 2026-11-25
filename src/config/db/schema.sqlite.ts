@@ -6,7 +6,13 @@
  */
 
 import { sql } from 'drizzle-orm';
-import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import {
+  index,
+  integer,
+  primaryKey,
+  sqliteTable,
+  text,
+} from 'drizzle-orm/sqlite-core';
 
 const table = sqliteTable;
 
@@ -844,3 +850,40 @@ export const operationsExperiment = table(
 
 export type AnalyticsVisitor = typeof analyticsVisitor.$inferSelect;
 export type OperationsExperiment = typeof operationsExperiment.$inferSelect;
+
+// Parameter snapshots belong to a single user and are replaced with a revision check.
+export const cadProject = table(
+  'cad_project',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    versions: text('versions').notNull(),
+    currentIndex: integer('current_index').notNull(),
+    revision: integer('revision').notNull(),
+    createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+    updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
+    deletedAt: integer('deleted_at', { mode: 'timestamp_ms' }),
+  },
+  (t) => [
+    index('idx_cad_project_user_updates').on(
+      t.userId,
+      t.deletedAt,
+      t.updatedAt
+    ),
+  ]
+);
+
+export const cadUsage = table(
+  'cad_usage',
+  {
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    period: text('period').notNull(),
+    used: integer('used').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.period] })]
+);

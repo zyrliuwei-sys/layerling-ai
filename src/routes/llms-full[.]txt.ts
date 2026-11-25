@@ -6,7 +6,21 @@ import { getLocalPosts, mergePosts } from '@/content/posts';
 
 const STATIC_PAGES: { path: string; title: string; description: string }[] = [
   { path: '', title: 'Home', description: 'Landing page' },
-  { path: '/pricing', title: 'Pricing', description: 'Pricing plans' },
+  {
+    path: '/studio',
+    title: 'AI Studio',
+    description: 'Generate and export printable enclosures',
+  },
+  {
+    path: '/editor',
+    title: 'CAD Editor',
+    description: 'Free browser-based CAD editing',
+  },
+  {
+    path: '/layerling-cad',
+    title: 'Layerling CAD Guide',
+    description: 'Design, fit, and export parts for 3D printing',
+  },
   { path: '/blog', title: 'Blog', description: 'Blog posts and articles' },
 ];
 

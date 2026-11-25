@@ -177,7 +177,10 @@ export function AgentLogs() {
                 setPage(1);
               }}
             >
-              <SelectTrigger className="w-48">
+              <SelectTrigger
+                aria-label={m['admin.agent.log_agent']()}
+                className="h-10 w-48 sm:h-9"
+              >
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

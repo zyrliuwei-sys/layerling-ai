@@ -72,7 +72,7 @@ function GuestPostsPage() {
 
   const action = cn(
     buttonVariants({ variant: 'ghost', size: 'sm' }),
-    'h-7 gap-1 px-2 text-xs'
+    'text-foreground h-10 gap-1 px-2 text-xs transition-[background-color,border-color] sm:h-7'
   );
   const columns: Column<GuestPostRow>[] = [
     {
@@ -196,7 +196,10 @@ function GuestPostsPage() {
                 value={status}
                 onValueChange={(value) => setStatus(value || 'all')}
               >
-                <SelectTrigger className="h-9 w-[150px]">
+                <SelectTrigger
+                  className="h-10 w-[150px] sm:h-9"
+                  aria-label={m['guest_posts.status_col']()}
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

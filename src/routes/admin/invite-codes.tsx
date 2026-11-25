@@ -163,7 +163,8 @@ function InviteCodesPage() {
           <Button
             variant="ghost"
             size="icon"
-            className="size-6"
+            className="size-10 sm:size-6"
+            aria-label={m['admin.invite_codes.copy_code']()}
             onClick={() => copyCode(r.code)}
           >
             <Copy className="size-3" />
@@ -214,7 +215,8 @@ function InviteCodesPage() {
         <Button
           variant="ghost"
           size="icon"
-          className="size-7"
+          className="size-10 sm:size-7"
+          aria-label={m['admin.invite_codes.delete_title']()}
           onClick={() => setDeletingId(r.id)}
         >
           <Trash2 className="text-destructive size-4" />

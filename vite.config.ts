@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 import { paraglideVitePlugin } from '@inlang/paraglide-js';
 import mdx from '@mdx-js/rollup';
@@ -25,8 +26,9 @@ loadEnvFiles();
 const isCloudflareBuild = (process.env.NITRO_PRESET || '').includes(
   'cloudflare'
 );
-const driverStub = new URL('./src/core/db/driver-stub.ts', import.meta.url)
-  .pathname;
+const driverStub = fileURLToPath(
+  new URL('./src/core/db/driver-stub.ts', import.meta.url)
+);
 
 // Prefer wrangler.jsonc over the build-time env, which can be polluted by
 // .env.local (e.g. DATABASE_PROVIDER=sqlite for local dev).
@@ -119,6 +121,18 @@ export default defineConfig({
       srcDirectory: 'src',
     }),
     viteReact(),
-    nitro(),
+    nitro({
+      compressPublicAssets: !isCloudflareBuild && { gzip: true },
+      routeRules: {
+        '/assets/**': {
+          headers: { 'cache-control': 'public, max-age=31536000, immutable' },
+        },
+      },
+      // Let the D1 proxy shut down when Nitro restarts the local SSR process.
+      devServer: {
+        runner:
+          process.env.DATABASE_PROVIDER === 'd1' ? 'node-process' : undefined,
+      },
+    }),
   ],
 });

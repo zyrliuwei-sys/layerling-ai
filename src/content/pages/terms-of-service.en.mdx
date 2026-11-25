@@ -1,16 +1,20 @@
+import { Link } from '../../core/i18n/navigation';
+import { m } from '../../paraglide/messages.js';
+
 export const meta = {
   title: 'Terms of Service',
-  description: 'The terms and conditions for using our service.',
-  updated_at: '2026-05-21',
+  description:
+    'The terms for using layerling ai to generate, edit, save, and export models for 3D printing.',
+  updated_at: '2026-11-25',
 };
 
 ## Acceptance of Terms
 
-By accessing or using this service, you agree to be bound by these Terms of Service. If you do not agree, please do not use the service.
+By accessing or using layerling ai, you agree to these Terms of Service. If you do not agree, please do not use the service.
 
 ## Description of Service
 
-We provide a software-as-a-service platform. We may modify, suspend, or discontinue any part of the service at any time, with reasonable notice where possible.
+layerling ai is an online 3D modeling service for 3D printing. You can generate an electronics enclosure from a text description, adjust its dimensions, design custom parts in the CAD editor, and export models as STL or 3MF. You are responsible for checking fit, material, dimensions, and the suitability of a part before manufacturing or using it.
 
 ## User Accounts
 
@@ -26,13 +30,9 @@ You agree not to:
 - Interfere with or disrupt the integrity or performance of the service.
 - Use the service to send spam, malware, or other harmful content.
 
-## Payment and Billing
-
-Paid features are billed in advance for the selected billing period. You are responsible for providing accurate billing information. Refunds are handled on a case-by-case basis in line with our refund policy.
-
 ## Intellectual Property
 
-The service and its original content, features, and functionality are owned by us and are protected by international copyright, trademark, and other intellectual property laws.
+You retain your rights in the designs you submit and create. You allow the service to process and store your designs as needed to provide the editor and project features. The independently hosted Layerling editor is available under its upstream license. Its editor page links to the corresponding project and license.
 
 ## Termination
 
@@ -48,4 +48,4 @@ We may modify these Terms at any time. We will notify users of any material chan
 
 ## Contact
 
-If you have questions about these Terms, please contact us at the email address provided on our website.
+For questions about these Terms, email <Link href={`mailto:${m['common.support.email']()}`}>{m['common.support.email']()}</Link>.

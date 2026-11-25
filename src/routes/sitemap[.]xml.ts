@@ -1,12 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router';
 
+import { getAllConfigs } from '@/modules/config/service';
 import { serverSiteOrigin } from '@/lib/site-origin';
 import { baseLocale, locales, localizeUrl } from '@/paraglide/runtime.js';
 import { getLocalPosts, mergePosts } from '@/content/posts';
 
 const STATIC_PATHS = [
   '',
-  '/pricing',
+  '/studio',
+  '/editor',
+  '/examples',
+  '/layerling-cad',
   '/blog',
   '/privacy-policy',
   '/terms-of-service',
@@ -25,18 +29,29 @@ function urlFor(path: string, locale: string, origin: string): string {
   }).href;
 }
 
+function escapeXml(value: string): string {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&apos;');
+}
+
 function entryXml(e: Entry, origin: string): string {
   const alternates = locales
     .map(
       (loc) =>
-        `    <xhtml:link rel="alternate" hreflang="${loc}" href="${urlFor(e.path, loc, origin)}"/>`
+        `    <xhtml:link rel="alternate" hreflang="${loc}" href="${escapeXml(urlFor(e.path, loc, origin))}"/>`
     )
     .join('\n');
   return [
     '  <url>',
-    `    <loc>${urlFor(e.path, baseLocale, origin)}</loc>`,
+    `    <loc>${escapeXml(urlFor(e.path, baseLocale, origin))}</loc>`,
     alternates,
-    e.lastModified ? `    <lastmod>${e.lastModified}</lastmod>` : null,
+    e.lastModified
+      ? `    <lastmod>${escapeXml(e.lastModified)}</lastmod>`
+      : null,
     `    <changefreq>${e.changeFrequency}</changefreq>`,
     `    <priority>${e.priority}</priority>`,
     '  </url>',
@@ -49,6 +64,8 @@ export const Route = createFileRoute('/sitemap.xml')({
   server: {
     handlers: {
       GET: async () => {
+        const origin = serverSiteOrigin();
+        const configs = getAllConfigs().catch(() => null);
         const entries: Entry[] = STATIC_PATHS.map((path) => ({
           path,
           changeFrequency: path === '/blog' ? 'daily' : 'weekly',
@@ -70,7 +87,7 @@ export const Route = createFileRoute('/sitemap.xml')({
           const posts = mergePosts(dbPosts, getLocalPosts(baseLocale));
           for (const post of posts) {
             entries.push({
-              path: `/blog/${post.slug}`,
+              path: `/blog/${encodeURIComponent(post.slug)}`,
               lastModified: post.createdAt,
               changeFrequency: 'monthly',
               priority: 0.6,
@@ -80,7 +97,7 @@ export const Route = createFileRoute('/sitemap.xml')({
           // Database unreachable — static paths + local posts still listed.
           for (const post of getLocalPosts(baseLocale)) {
             entries.push({
-              path: `/blog/${post.slug}`,
+              path: `/blog/${encodeURIComponent(post.slug)}`,
               lastModified: post.createdAt,
               changeFrequency: 'monthly',
               priority: 0.6,
@@ -88,10 +105,18 @@ export const Route = createFileRoute('/sitemap.xml')({
           }
         }
 
+        if ((await configs)?.guest_post_enabled === 'true') {
+          entries.push({
+            path: '/guest-post',
+            changeFrequency: 'weekly',
+            priority: 0.6,
+          });
+        }
+
         const xml = [
           '<?xml version="1.0" encoding="UTF-8"?>',
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',
-          ...entries.map((entry) => entryXml(entry, serverSiteOrigin())),
+          ...entries.map((entry) => entryXml(entry, origin)),
           '</urlset>',
           '',
         ].join('\n');

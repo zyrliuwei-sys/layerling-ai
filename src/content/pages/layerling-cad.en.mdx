@@ -1,0 +1,78 @@
+import { layerlingDownloadUrl } from '../../config/cad-editor';
+import { Link } from '../../core/i18n/navigation';
+import { m } from '../../paraglide/messages.js';
+
+export const meta = {
+  title: 'Design Models for 3D Printing with layerling ai',
+  description:
+    'Generate an electronics enclosure from text, refine its dimensions, and export an STL or 3MF file for 3D printing.',
+  updated_at: '2026-11-25',
+  cover: '/imgs/cad/enclosure-assembled.webp',
+  share_image: '/imgs/cad/share-enclosure.jpg',
+  sections: [
+    { id: 'choose-a-workflow', title: 'Choose a workflow' },
+    { id: 'measure-your-part', title: 'Measure your part' },
+    { id: 'design-an-enclosure', title: 'Design an enclosure' },
+    { id: 'edit-in-layerling', title: 'Edit in Layerling' },
+    { id: 'export-stl-or-3mf', title: 'Export STL or 3MF' },
+    { id: 'check-your-first-print', title: 'Check your first print' },
+  ],
+};
+
+<h2 id="choose-a-workflow">Choose a workflow for online CAD</h2>
+
+layerling ai is an online 3D modeling workspace for parts you plan to print. An enclosure, bracket, or spacer starts with measurements you can verify on your desk. For an electronics project, that might mean the width of a circuit board, the height of its tallest component, and the space a USB plug needs outside the case. Knowing these numbers makes it easier to spot fit problems while editing the model.
+
+Use <Link href="/studio">AI Studio</Link> when the part is a rectangular electronics enclosure. Start with a plain-English description, then confirm the width, depth, height, wall thickness, corner radius, holes, and lid in the properties panel. Guided commands and direct parameter editing are free. If an external AI provider is enabled, signed-in accounts also have a free monthly AI allowance.
+
+Choose the <Link href="/editor">online Layerling editor</Link> for brackets, adapters, spacers, or changes that call for direct geometry editing. Its workplane lets you place solid shapes and cutters. You can combine pieces, round edges, and hollow bodies. The two tools have separate project stores. Use an exported file to move a design from Studio into the manual editor. [Layerling source and documentation](https://github.com/henmedia/layerling)
+
+<h2 id="measure-your-part">Measure the part before opening CAD</h2>
+
+Mark the board's width and depth first, then measure from its underside to its tallest component. Check the areas around connectors, screw heads, switches, antenna leads, and wire exits. Take cable measurements with the plug inserted. The metal connector on a board may be only a few millimeters tall, while the molded plug and strain relief reach farther into the case or past its outside edge.
+
+Write down whether your dimensions describe the inside cavity or the outside of the enclosure. Studio uses outside width, depth, and height for the body. A 100 × 60 mm body with walls 2 mm thick has about 96 × 56 mm of inside space between the straight walls. The floor, corners, and lid can reduce usable space further. Check the outer height of an installed lid as well if the case has to fit under a desk or inside another cabinet.
+
+For mounting holes, record the centers and the diameter separately. Use the same corner as a reference when measuring your board and checking the preview. Leave room around each hole for a screw head, and think about how you will reach the fastening points after the board is in place. Hole diameters can print differently across materials and machines. A small test piece with your planned hole size gives you a better starting point than a universal clearance number.
+
+Choose how the design will sit on the print bed early. A flat base is convenient, but the shape above it still matters. A horizontal cable opening leaves a short bridge for the slicer to handle. If that bridge is too long for your settings, try a shorter opening, a different print orientation, or a detached faceplate you can print separately. Leave enough space on the bed for any brim or supports your slicer adds.
+
+<h2 id="design-an-enclosure">Design a 3D-printed electronics enclosure</h2>
+
+Open the <Link href="/studio">enclosure generator</Link> or load a starter design from the <Link href="/examples">example library</Link>. Describe one piece of hardware at a time, using millimeters and specifying which side needs a cable opening. For a first model, enter the outside dimensions, wall thickness, and lid style before adding smaller details.
+
+> Make an electronics enclosure 100 mm wide, 60 mm deep, and 30 mm high. Use 2 mm walls, four 3 mm mounting holes, a removable lid, and a 14 × 7 mm front port.
+
+Review the preview before applying the change. Orbit the model to look inside the body, check that the opening is on the correct wall, and inspect the lid separately. Use the top view to compare hole placement against the board. If the case has to fit within an existing bracket, use the front view to compare the outside proportions with your measurements.
+
+The parameter controls let you revise the design without rewriting the original description. If a plug needs more room, widen the port and leave the overall width alone. If two holes are too close to the edges, change their inset and check again. When a proposed change conflicts with the existing dimensions, adjust the affected measurements and preview again. After applying a change, undo and redo give you a way to compare it against the previous version. You can save to this browser or sign in to keep private account projects and reopen them on another device.
+
+Studio places mounting holes using a shared inset from the edges. Compare the resulting hole spacing against the board before printing, especially if the mounting pattern is asymmetric. For independent hole locations, export the body and continue in the manual editor. When the body, lid, and cable opening look right, record the dimensions you intend to test. A saved revision is useful even if you later replace the entire case, because it preserves the details you already checked.
+
+<h2 id="edit-in-layerling">Edit geometry in the Layerling CAD editor</h2>
+
+Open the manual editor for features beyond Studio's rectangular enclosure controls. A right-angle mounting bracket, for example, can start with two overlapping boxes. Set one box's thickness and height, place the other at a right angle, then group them into a single solid. To create holes, position cylinders as cutters and group them with the bracket. Inspect the underside and the ends to make sure the holes pass through the material you meant to cut.
+
+If you already have a fixture, compare the real part with your design as you work. Rotate the view to check intersections, and use a side or top view when positioning a cutter. Keep a copy before grouping shapes so you can return to the earlier design. Rounded edges may make a case easier to handle, while a compact radius leaves more material around nearby corners and mounting holes.
+
+Layerling can import 3D files, including STL, 3MF, and STEP. To continue with a Studio model, download it and open it in the manual editor. A mesh export carries the geometry, so retain the Studio project if you also want to edit its original dimensions or revisit its revision history. The manual editor saves its projects separately in the browser. [Layerling getting started guide](https://layerling.com/guide/getting-started.html)
+
+<h2 id="export-stl-or-3mf">Export a 3D model as STL or 3MF</h2>
+
+Choose STL for a simple mesh that is widely supported by slicers. STL stores triangles without specifying a unit, so confirm that your slicer reads the model in millimeters and that a known measurement still matches. A model that should be 100 mm wide is a quick way to check whether the import changed scale. An STL file can also serve as a straightforward handoff when a print shop asks only for the finished shape.
+
+Choose 3MF when your slicer supports it and you want a format that can record units and hold multiple objects. That is useful for a design with a separate lid and body. Studio exports the body and lid side by side and flips the lid so its outer face rests on the build plate. Check that both pieces fit on your printer. If you need additional formats or manual control over the geometry, use the export options in the original Layerling editor. [3MF Consortium format overview](https://3mf.io/)
+
+Keep a design copy alongside the file you send to the slicer. When you revise the design, give the new export a meaningful name such as `sensor-case-v2` so it is easy to tell which version fits which board. In your slicer, verify the dimensions, that holes remain open, and that separate components are present. Then choose orientation, material, support settings, and layer height for your own printer.
+
+<h2 id="check-your-first-print">
+  Check your first print and keep the dimensions
+</h2>
+
+Print a short sample when fit matters more than surface finish on the first attempt. A section of the front wall can tell you whether the cable goes in far enough. A reduced-height tray can tell you whether the board sits flat and the mounting holes line up. A narrow strip shaped like part of the lid can help you check grip and clearance without waiting for a full build.
+
+Put the components in place before making several changes at once. If a plug rubs against the opening, note which edge it contacts and whether its cable can bend naturally. If the lid is hard to remove, check whether it binds at one specific corner. Measurements from the test print are more useful when you record where the fit failed and which settings you used. Start the next revision by changing that dimension, then repeat the smallest test that can verify the fix.
+
+For your next project, open <Link href="/studio">AI Studio</Link> when you already know the shape and dimensions of an enclosure, or start with the <Link href="/editor">free online CAD editor</Link> when you want to build from solids and cutters. For self-hosting, <Link href={layerlingDownloadUrl} download>download the CAD Editor ZIP</Link>.
+
+For help with model generation or exports, email <Link href={`mailto:${m['common.support.email']()}`}>{m['common.support.email']()}</Link>.

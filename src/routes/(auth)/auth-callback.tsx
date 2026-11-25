@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { Loader2 } from 'lucide-react';
 
 import { useSession } from '@/core/auth/client';
-import { apiGet } from '@/lib/api-client';
+import { apiPost } from '@/lib/api-client';
 import {
   isAllowedAppProtocolUrl,
   isAppProtocolUrl,
@@ -68,11 +68,13 @@ function AuthCallbackPage() {
     }
 
     handledRef.current = true;
-    apiGet<{ token: string }>('/api/auth/token')
+    apiPost<{ token: string }>(
+      `/api/auth/token?redirect=${encodeURIComponent(target as string)}`
+    )
       .then(({ token }) => {
-        const url = target as string;
-        const separator = url.includes('?') ? '&' : '?';
-        window.location.href = `${url}${separator}token=${encodeURIComponent(token)}`;
+        const url = new URL(target as string);
+        url.searchParams.set('token', token);
+        window.location.href = url.href;
       })
       .catch((err: Error) => {
         handledRef.current = false;

@@ -21,6 +21,7 @@ export const envConfigs: Record<string, string> = {
     publicEnv('VITE_APP_DESCRIPTION') ??
     'Your workspace for projects and tools.',
   app_logo: publicEnv('VITE_APP_LOGO') ?? '/logo.svg',
+  layerling_editor_url: publicEnv('VITE_LAYERLING_EDITOR_URL') ?? '',
 
   // Database
   database_url: procEnv.DATABASE_URL ?? '',

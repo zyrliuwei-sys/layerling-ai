@@ -1219,6 +1219,87 @@ test('browser sessions still read and write, while foreign origins and bad beare
   );
   assert.equal((await write('http://localhost:3000')).status, 200);
 });
+test('the admin entry requires dashboard access for the current browser account', async () => {
+  const { Route } = await import('../src/routes/api/user/permissions');
+  const { GET } = Route.options.server!.handlers as {
+    GET: (context: { request: Request }) => Promise<Response>;
+  };
+  const dashboardUser = 'dashboard-user';
+  await db()
+    .insert(schema.user)
+    .values({
+      id: dashboardUser,
+      name: 'Dashboard member',
+      email: `${dashboardUser}@example.test`,
+    });
+  await db().insert(schema.role).values({
+    id: 'dashboard-role',
+    name: 'dashboard-test',
+    title: 'Dashboard',
+    status: 'active',
+  });
+  await db().insert(schema.permission).values({
+    id: 'dashboard-access',
+    code: 'admin.access',
+    resource: 'admin',
+    action: 'access',
+    title: 'Admin Access',
+  });
+  await db().insert(schema.rolePermission).values({
+    id: 'dashboard-role-permission',
+    roleId: 'dashboard-role',
+    permissionId: 'dashboard-access',
+  });
+  await db().insert(schema.userRole).values({
+    id: 'dashboard-user-role',
+    userId: dashboardUser,
+    roleId: 'dashboard-role',
+  });
+  const password = 'isolated-dashboard-test-password-123';
+  const hashedPassword = await hashPassword(password);
+  await db()
+    .insert(schema.account)
+    .values(
+      [dashboardUser, 'viewer'].map((userId) => ({
+        id: `${userId}-dashboard-password`,
+        accountId: userId,
+        userId,
+        providerId: 'credential',
+        password: hashedPassword,
+      }))
+    );
+
+  const url = 'http://localhost:3000/api/user/permissions';
+  async function permissionsFor(userId: string) {
+    const login: Response = await getAuth().api.signInEmail({
+      body: { email: `${userId}@example.test`, password },
+      asResponse: true,
+      headers: new Headers({ Origin: new URL(url).origin }),
+    });
+    assert.equal(login.status, 200);
+    const cookie = login.headers
+      .getSetCookie()
+      .map((value) => value.split(';')[0])
+      .join('; ');
+    const response = await GET({
+      request: new Request(url, { headers: { Cookie: cookie } }),
+    });
+    return (await response.json()).data;
+  }
+
+  const [admin, viewer, guest] = await Promise.all([
+    permissionsFor(dashboardUser),
+    permissionsFor('viewer'),
+    GET({ request: new Request(url) }),
+  ]);
+  assert.deepEqual(admin, { isAdmin: true, permissions: ['admin.access'] });
+  assert.deepEqual(viewer, {
+    isAdmin: false,
+    permissions: ['admin.users.read'],
+  });
+  assert.notEqual((await guest.json()).code, 0);
+});
+
 test('legacy MCP clients can initialize and list tools on the stateless HTTP endpoint', async () => {
   async function rpc(body: unknown) {
     const response = await fetch(`${baseUrl}/api/admin/agent/mcp`, {

@@ -322,7 +322,8 @@ function PaymentsPage() {
           <Button
             variant="ghost"
             size="icon"
-            className="size-7"
+            className="size-10 sm:size-7"
+            aria-label={m['admin.payments.edit_title']()}
             onClick={() => openEdit(o)}
           >
             <Pencil className="size-4" />
@@ -377,7 +378,10 @@ function PaymentsPage() {
                 value={statusFilter}
                 onValueChange={(value) => setStatusFilter(value || 'all')}
               >
-                <SelectTrigger className="h-8 w-[120px]">
+                <SelectTrigger
+                  className="h-10 w-[120px] sm:h-8"
+                  aria-label={m['admin.payments.status']()}
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -431,7 +435,9 @@ function PaymentsPage() {
                       value={field.state.value}
                       onValueChange={(value) => field.handleChange(value || '')}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger
+                        aria-label={m['admin.payments.status_label']()}
+                      >
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>

@@ -8,13 +8,13 @@ build
 src/routeTree.gen.ts
 src/paraglide
 
-# env files — .env.production is created by CI and needed at build time
-# so Vite can inline VITE_* into the client bundle.
-.env
-.env.local
-.env.development
+# Build credentials are supplied by a BuildKit secret mount.
+**/.env
+**/.env.*
 !.env.example
-!.env.production
+**/.npmrc
+**/.netrc
+**/.pypirc
 
 # local database
 data
@@ -44,3 +44,30 @@ LICENSE
 *.log
 *.pem
 *.tsbuildinfo
+
+# Local artifacts and credentials are excluded from the build context.
+public/uploads
+.indexnow-backup-*
+.seeapi-backup-*
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+**/*.pem
+**/*.keystore
+**/*.jks
+**/id_rsa*
+**/id_ed25519*
+**/id_ecdsa*
+**/credentials*.json
+**/service-account*.json
+**/service_account*.json
+**/serviceaccount*.json
+**/*.db
+**/*.sqlite
+**/*.sqlite3
+**/*-wal
+**/*-shm
+**/*.db-journal
+**/*.sqlite-journal
+**/*.sqlite3-journal

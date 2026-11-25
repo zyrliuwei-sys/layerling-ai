@@ -11,6 +11,7 @@ import {
   index,
   integer,
   pgTable,
+  primaryKey,
   text,
   timestamp,
 } from 'drizzle-orm/pg-core';
@@ -780,3 +781,40 @@ export const operationsExperiment = table(
 
 export type AnalyticsVisitor = typeof analyticsVisitor.$inferSelect;
 export type OperationsExperiment = typeof operationsExperiment.$inferSelect;
+
+// Parameter snapshots belong to a single user and are replaced with a revision check.
+export const cadProject = table(
+  'cad_project',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    versions: text('versions').notNull(),
+    currentIndex: integer('current_index').notNull(),
+    revision: integer('revision').notNull(),
+    createdAt: timestamp('created_at').notNull(),
+    updatedAt: timestamp('updated_at').notNull(),
+    deletedAt: timestamp('deleted_at'),
+  },
+  (t) => [
+    index('idx_cad_project_user_updates').on(
+      t.userId,
+      t.deletedAt,
+      t.updatedAt
+    ),
+  ]
+);
+
+export const cadUsage = table(
+  'cad_usage',
+  {
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    period: text('period').notNull(),
+    used: integer('used').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.period] })]
+);

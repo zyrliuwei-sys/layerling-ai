@@ -46,6 +46,50 @@ exports, permission codes, and behavior that changes for end users.
 
 ---
 
+## 2026-11-25: Production secret storage and Docker builds
+
+- Set `CONFIG_ENCRYPTION_KEY` in the production runtime before saving provider
+  credentials or issuing API keys. Keep the existing key if one is already set.
+  Legacy plaintext settings remain readable and are encrypted when saved again.
+- The Docker workflow mounts `ENV_PRODUCTION` with BuildKit. Local Docker
+  builds can pass `--secret id=production_env,src=.env.production` for the
+  build-time settings. Supply server secrets in the container runtime.
+- The browser desktop sign-in callback now makes a same-origin `POST` to
+  `/api/auth/token` with its allowed `redirect` target. External scripts that
+  called the legacy `GET` endpoint need the updated sign-in flow.
+- Production image uploads require configured object storage. The local file
+  fallback remains available for development.
+
+## 2026-11-25: Admin navigation
+
+The CAD site and workspace show an Admin link when the signed-in account has
+`admin.access`. The admin page and invite exemption use the same permission.
+For custom roles that need the admin dashboard, grant the existing
+`admin.access` permission.
+
+## 2026-11-25: Free CAD tools
+
+The pricing URL redirects to `/studio`, and the public checkout endpoint returns
+HTTP 410. Existing billing data remains available. Credit and billing pages are
+off by default and keep any explicitly saved admin settings. The AI provider
+allowance is shared across accounts, independent of subscription history.
+Guided commands do not use that allowance.
+
+## 2026-11-25: CAD workspace storage and prompt usage
+
+Existing databases need the new `cad_project` and `cad_usage` tables. Port the
+matching schema definitions into `src/config/db/schema.ts` and review the
+Drizzle migration before applying it to the production database. The migration
+creates two tables and an index. Existing user and billing tables keep their
+rows and column definitions.
+
+CAD prompt usage counts operations by UTC calendar month. The server grants
+5, 100, or 500 operations based on an active subscription in the pricing
+catalog. Set an OpenAI API key under Admin → Settings → AI to enable the AI
+interpreter. The editor supports rule-based prompts when no key is configured.
+For an OpenAI-compatible provider, configure the API base URL with the key.
+The interpreter uses `gpt-4o-mini` and requires structured Chat Completions.
+
 ## 2026-11-14: SeeAPI credential settings and portable installer
 
 Admin → Settings → AI now includes SeeAPI (`seeapi_base_url`,

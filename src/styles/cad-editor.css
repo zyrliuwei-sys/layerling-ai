@@ -1,0 +1,230 @@
+.cad-editor-main {
+  padding-block: clamp(28px, 4vw, 53px) 55px;
+}
+.cad-editor-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 22px;
+}
+.cad-editor-heading h1 {
+  font-size: clamp(2.85rem, 6.2vw, 5.8rem);
+}
+.cad-editor-heading p,
+.cad-editor-footer {
+  color: var(--cad-muted);
+  font-size: 0.875rem;
+}
+.cad-editor-heading p {
+  max-width: 59ch;
+  margin-top: 10px;
+}
+.cad-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cad-editor-install {
+  border-color: var(--cad-line);
+}
+.cad-editor-install:hover {
+  background: var(--cad-surface);
+  border-color: var(--brand-link);
+}
+.cad-editor-stage {
+  scroll-margin-block-start: 12px;
+}
+.cad-editor-frame {
+  width: 100%;
+  height: max(560px, calc(100dvh - 264px));
+  display: block;
+  border: 1px solid var(--cad-line);
+  border-radius: var(--brand-corner);
+  background: var(--brand-board);
+}
+html:has(.cad-editor-stage--expanded) {
+  overflow: hidden;
+}
+.cadm-marketing:has(.cad-editor-stage--expanded) {
+  visibility: hidden;
+}
+.cad-editor-stage--expanded {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  visibility: visible;
+}
+.cad-editor-stage:is(:fullscreen, .cad-editor-stage--expanded) {
+  display: flex;
+  flex-direction: column;
+  background: var(--cad-paper);
+}
+.cad-editor-stage:is(:fullscreen, .cad-editor-stage--expanded)
+  .cad-editor-heading {
+  display: flex;
+  flex: none;
+  flex-direction: row;
+  justify-content: flex-end;
+  margin: 0;
+  padding: max(6px, env(safe-area-inset-top))
+    max(12px, env(safe-area-inset-right)) 6px
+    max(12px, env(safe-area-inset-left));
+  border-bottom: 1px solid var(--cad-line);
+}
+.cad-editor-stage:is(:fullscreen, .cad-editor-stage--expanded)
+  :is(.cad-editor-intro, .cad-editor-install, .cad-editor-open-tab) {
+  display: none;
+}
+.cad-editor-stage:is(:fullscreen, .cad-editor-stage--expanded)
+  .cad-editor-frame {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+}
+.cad-editor-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 13px;
+}
+.cad-editor-resources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+}
+.cad-editor-footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--brand-link);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.cad-editor-overview {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+  border-top: 1px solid var(--cad-line);
+  margin-top: 46px;
+  padding-top: 30px;
+}
+.cad-editor-overview h2 {
+  font: 700 clamp(2rem, 4vw, 3.1rem)/1 var(--font-display);
+}
+.cad-editor-overview p {
+  max-width: 69ch;
+  margin-top: 8px;
+  color: var(--cad-muted);
+}
+
+.cadm-online-editor {
+  min-width: 0;
+}
+.cadm-online-editor .cad-editor-intro h2 {
+  color: var(--cad-ink);
+  font: 700 clamp(1.03rem, 1.45vw, 1.35rem)/1.05 var(--font-display);
+}
+.cadm-online-editor
+  .cad-editor-stage:not(:fullscreen, .cad-editor-stage--expanded) {
+  overflow: hidden;
+  border: 1px solid var(--cad-line);
+  border-radius: var(--brand-corner);
+  background: var(--cad-surface);
+}
+.cadm-online-editor
+  .cad-editor-stage:not(:fullscreen, .cad-editor-stage--expanded)
+  .cad-editor-heading {
+  align-items: center;
+  flex-flow: row wrap;
+  gap: 6px 15px;
+  margin: 0;
+  padding: 9px clamp(9px, 1.35vw, 18px);
+  border-bottom: 1px solid var(--cad-line);
+}
+.cadm-online-editor .cad-editor-actions .cadm-button {
+  min-height: 44px;
+  padding: 6px 10px;
+  gap: 7px;
+  font-size: 0.78rem;
+}
+.cadm-online-editor
+  .cad-editor-stage:not(:fullscreen, .cad-editor-stage--expanded)
+  .cad-editor-frame {
+  height: clamp(440px, calc(100svh - 225px), 740px);
+  border: 0;
+  border-radius: 0;
+}
+.cad-editor-viewport {
+  position: relative;
+}
+.cad-editor-loading {
+  position: absolute;
+  z-index: 1;
+  inset: 10px 10px auto auto;
+  display: grid;
+  max-width: calc(100% - 20px);
+  gap: 3px;
+  padding: 8px 12px;
+  border: 1px solid var(--cad-line);
+  border-radius: 6px;
+  background: var(--cad-surface);
+  color: var(--cad-ink);
+  font-size: 0.84rem;
+  pointer-events: none;
+}
+.cad-editor-loading span {
+  color: var(--cad-muted);
+  font-size: 0.86rem;
+}
+.cadm-online-editor .cad-editor-stage[data-active='false'] .cad-editor-heading {
+  border-bottom: 0;
+  padding: clamp(12px, 1.55vw, 21px);
+}
+.cadm-online-editor
+  .cad-editor-stage[data-active='false']
+  .cad-editor-intro
+  h2 {
+  font-size: clamp(1.45rem, 2.35vw, 2.2rem);
+}
+.cad-editor-stage:is(:fullscreen, .cad-editor-stage--expanded)
+  .cad-editor-viewport {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+@media (max-width: 780px) {
+  .cad-editor-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 15px;
+  }
+}
+@media (max-width: 600px) {
+  .cadm-online-editor .cad-editor-open-tab span {
+    display: none;
+  }
+  .cadm-online-editor .cad-editor-open-tab {
+    min-width: 39px;
+  }
+  .cadm-online-editor .cad-editor-intro h2 {
+    font-size: 0.97rem;
+  }
+}
+@media (max-width: 460px) {
+  .cad-editor-overview {
+    align-items: start;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .cad-editor-actions .cadm-button {
+    min-height: 44px;
+    padding-inline: 10px;
+    gap: 7px;
+  }
+}

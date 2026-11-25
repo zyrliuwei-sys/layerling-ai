@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import {
+  Box,
   Coins,
   CreditCard,
   Home,
@@ -33,6 +34,11 @@ function SettingsLayout() {
       href: '/settings',
       label: m['settings.nav.overview'](),
       icon: LayoutDashboard,
+    },
+    {
+      href: '/projects',
+      label: m['cad.projects.metadata_title'](),
+      icon: Box,
     },
     {
       href: '/settings/profile',

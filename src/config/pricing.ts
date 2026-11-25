@@ -43,11 +43,40 @@ export type PricingProduct = {
   maxLinks?: number;
 };
 
+// New public checkouts are disabled for the free CAD workspace.
+export const publicCheckoutEnabled = false;
+
 /**
  * Default demo catalog. Replace with your real products when launching.
  * Keys MUST match what the pricing UI sends as product_id.
  */
 export const pricingCatalog: Record<string, PricingProduct> = {
+  cad_pro_monthly: {
+    productId: 'cad_pro_monthly',
+    productName: 'Pro',
+    planName: 'Pro',
+    description: 'CAD Pro Monthly',
+    type: PaymentType.SUBSCRIPTION,
+    priceInCents: 1200,
+    currency: 'usd',
+    credits: 0,
+    plan: { name: 'Pro', interval: PaymentInterval.MONTH, intervalCount: 1 },
+  },
+  cad_unlimited_monthly: {
+    productId: 'cad_unlimited_monthly',
+    productName: 'Unlimited',
+    planName: 'Unlimited',
+    description: 'CAD Unlimited Monthly',
+    type: PaymentType.SUBSCRIPTION,
+    priceInCents: 2900,
+    currency: 'usd',
+    credits: 0,
+    plan: {
+      name: 'Unlimited',
+      interval: PaymentInterval.MONTH,
+      intervalCount: 1,
+    },
+  },
   starter_monthly: {
     productId: 'starter_monthly',
     productName: 'Starter',
@@ -188,8 +217,9 @@ export const pricingCatalog: Record<string, PricingProduct> = {
 };
 
 export function getPricingProduct(productId: string): PricingProduct | null {
-  if (!productId) return null;
-  return pricingCatalog[productId] ?? null;
+  return Object.hasOwn(pricingCatalog, productId)
+    ? pricingCatalog[productId]
+    : null;
 }
 
 export function listPricingProducts(): PricingProduct[] {

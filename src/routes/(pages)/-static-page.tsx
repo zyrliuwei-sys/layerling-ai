@@ -1,14 +1,19 @@
 import type { ComponentType } from 'react';
 import { notFound, useLoaderData } from '@tanstack/react-router';
+import { ArrowUpRight } from 'lucide-react';
 
-import { envConfigs } from '@/config';
+import { Link } from '@/core/i18n/navigation';
+import { publicPageHead } from '@/lib/page-head';
 import { m } from '@/paraglide/messages.js';
-import { baseLocale, getLocale, localizeUrl } from '@/paraglide/runtime.js';
+import { baseLocale, getLocale } from '@/paraglide/runtime.js';
 
 type PageMeta = {
   title: string;
   description: string;
   updated_at: string;
+  cover?: string;
+  share_image?: string;
+  sections?: { id: string; title: string }[];
 };
 
 type PageModule = {
@@ -46,17 +51,14 @@ export function staticPageRouteOptions(slug: string) {
     },
     head: ({ loaderData }: { loaderData?: LoaderData }) => {
       if (!loaderData) return {};
-      const { meta, locale } = loaderData;
-      const canonical = localizeUrl(`${envConfigs.app_url}/${slug}`, {
-        locale: locale as ReturnType<typeof getLocale>,
-      }).href;
-      return {
-        meta: [
-          { title: meta.title },
-          { name: 'description', content: meta.description },
-        ],
-        links: [{ rel: 'canonical', href: canonical }],
-      };
+      const { meta } = loaderData;
+      return publicPageHead({
+        path: `/${slug}`,
+        title: meta.title,
+        description: meta.description,
+        type: meta.sections ? 'article' : 'website',
+        image: meta.share_image,
+      });
     },
     component: StaticPage,
   };
@@ -71,18 +73,57 @@ function StaticPage() {
   const Content = page.default;
 
   return (
-    <article>
-      <header className="border-border mb-6 border-b pb-5">
-        <h1 className="text-foreground text-3xl font-semibold tracking-tight md:text-4xl">
-          {meta.title}
-        </h1>
-        <p className="text-muted-foreground mt-2 text-sm">{meta.description}</p>
-        <p className="text-muted-foreground mt-2 text-xs">
-          {m['common.pages.last_updated']()}: {meta.updated_at}
-        </p>
+    <article
+      className={
+        meta.sections ? 'cad-article cad-article--guide' : 'cad-article'
+      }
+    >
+      <header className="cad-article-heading">
+        <div>
+          <h1>{meta.title}</h1>
+          <p>{meta.description}</p>
+          {!meta.sections && (
+            <p className="cad-article-date">
+              {m['common.pages.last_updated']()}{' '}
+              <time dateTime={meta.updated_at}>{meta.updated_at}</time>
+            </p>
+          )}
+          {meta.sections && (
+            <Link href="/studio" className="cadm-button cadm-button--primary">
+              {m['cad.guide.start']()}{' '}
+              <ArrowUpRight size={16} aria-hidden="true" />
+            </Link>
+          )}
+        </div>
+        {meta.cover && (
+          <div className="cad-article-cover">
+            <img
+              src={meta.cover}
+              alt={m['cad.guide.cover_alt']()}
+              width={1280}
+              height={920}
+            />
+          </div>
+        )}
       </header>
-      <div className="text-foreground/90 text-[15px] leading-7">
-        <Content />
+      <div className="cad-article-body">
+        {meta.sections && (
+          <aside className="cad-article-sidebar">
+            <nav aria-label={m['cad.guide.contents']()}>
+              <p>{m['cad.guide.contents']()}</p>
+              <ul>
+                {meta.sections.map(({ id, title }) => (
+                  <li key={id}>
+                    <a href={`#${id}`}>{title}</a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </aside>
+        )}
+        <div className="cad-article-copy">
+          <Content />
+        </div>
       </div>
     </article>
   );

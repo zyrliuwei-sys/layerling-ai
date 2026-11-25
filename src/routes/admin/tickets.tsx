@@ -261,7 +261,8 @@ function AdminTicketsPage() {
         <Button
           variant="ghost"
           size="icon"
-          className="size-7"
+          className="size-10 sm:size-7"
+          aria-label={m['common.table.view_details']()}
           onClick={() => openDetail(r)}
         >
           <MessageSquare className="size-4" />

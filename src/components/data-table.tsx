@@ -110,17 +110,20 @@ export function DataTable<T>({
   return (
     <div className="space-y-4">
       {showHeader && (
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {onSearchChange && (
-            <div className="relative max-w-sm">
-              <Search className="text-muted-foreground absolute top-2.5 left-2.5 size-4" />
+            <div className="relative max-w-sm min-w-0 grow basis-44">
+              <Search className="text-muted-foreground pointer-events-none absolute inset-y-0 left-2.5 my-auto size-4" />
               <Input
                 value={search || ''}
                 onChange={(e) => onSearchChange(e.target.value)}
                 placeholder={
                   searchPlaceholder || m['common.search.placeholder']()
                 }
-                className="h-9 pl-8"
+                aria-label={
+                  searchPlaceholder || m['common.search.placeholder']()
+                }
+                className="h-10 pl-8 sm:h-9"
               />
             </div>
           )}
@@ -129,7 +132,7 @@ export function DataTable<T>({
             <Button
               variant="outline"
               size="icon"
-              className="ml-auto size-9"
+              className="ml-auto size-10 sm:size-9"
               onClick={handleRefresh}
               disabled={busy}
               aria-label={m['common.table.refresh']()}
@@ -208,7 +211,7 @@ export function DataTable<T>({
         </Table>
       </div>
 
-      <div className="flex items-center justify-between px-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-2">
         <p className="text-muted-foreground text-sm">
           {initialLoading ? '' : m['common.table.total']({ count: total })}
         </p>
@@ -217,6 +220,7 @@ export function DataTable<T>({
             <Button
               variant="outline"
               size="sm"
+              className="min-h-10 sm:min-h-0"
               onClick={() => onPageChange(page - 1)}
               disabled={page <= 1}
             >
@@ -226,6 +230,7 @@ export function DataTable<T>({
             <Button
               variant="outline"
               size="sm"
+              className="min-h-10 sm:min-h-0"
               onClick={() => onPageChange(page + 1)}
               disabled={page >= totalPages}
             >

@@ -61,6 +61,10 @@ test('old auth and payment return targets stay English and cannot turn into exte
   );
   assert.equal(safeInternalPath('/zh/sign-in'), null);
   assert.equal(safeInternalPath('//foreign.example/path'), null);
+  assert.equal(
+    safeInternalPath('/docs/../settings?pane=profile#bio'),
+    '/settings?pane=profile#bio'
+  );
   assert.equal(localizedPath('/settings/billing', 'zh'), '/settings/billing');
 });
 

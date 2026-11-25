@@ -226,7 +226,8 @@ function RolesPage() {
           <Button
             variant="ghost"
             size="icon"
-            className="size-7"
+            className="size-10 sm:size-7"
+            aria-label={m['admin.roles.manage_permissions_title']()}
             onClick={() => openPermissions(r)}
           >
             <KeyRound className="size-3" />
@@ -234,7 +235,8 @@ function RolesPage() {
           <Button
             variant="ghost"
             size="icon"
-            className="size-7"
+            className="size-10 sm:size-7"
+            aria-label={m['admin.roles.edit_title']()}
             onClick={() => openEdit(r)}
           >
             <Pencil className="size-3" />
@@ -242,7 +244,8 @@ function RolesPage() {
           <Button
             variant="ghost"
             size="icon"
-            className="size-7"
+            className="size-10 sm:size-7"
+            aria-label={m['admin.roles.delete_title']()}
             onClick={() => setDeletingRole(r)}
           >
             <Trash2 className="size-3" />

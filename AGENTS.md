@@ -721,17 +721,15 @@ VITE_APP_DESCRIPTION=
 VITE_APP_LOGO=
 VITE_DEFAULT_LOCALE=en
 
-# Recommended: encrypt admin-settings secrets (AES-256-GCM) in the config table.
-# Unset = plaintext storage. Once set, keep it stable — rotating or removing it
-# orphans already-encrypted values (they fall back to env values).
+# Required in production when saving settings secrets or issuing API keys.
+# Keep it stable so AES-256-GCM encrypted data remains readable.
 CONFIG_ENCRYPTION_KEY=
 ```
 
 **Provider credentials live in the admin panel, not env.** Payments (Stripe/
 Creem/PayPal/Alipay/WeChat), OAuth (Google/GitHub/One-Tap), email (Resend),
 storage (R2), AI (Replicate/Gemini/Fal), and analytics are configured at
-`/admin/settings` and stored in the `config` table (encrypted when
-`CONFIG_ENCRYPTION_KEY` is set). Resolution is `{ ...envConfigs, ...dbConfigs }`
+`/admin/settings` and stored encrypted in the production `config` table. Resolution is `{ ...envConfigs, ...dbConfigs }`
 — same-named env vars still work as fallbacks, but database values win.
 Keep `.env.example` minimal; don't add provider keys to it.
 

@@ -18,7 +18,6 @@ import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages.js';
 import { useGuestPostInfo } from '@/hooks/use-guest-posts';
 import { useUserFeatures } from '@/hooks/use-user-features';
-import { buttonVariants } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -74,14 +73,12 @@ function StatCard({
   icon,
   value,
   hint,
-  action,
 }: {
   href: string;
   title: string;
   icon: ReactNode;
   value: ReactNode;
   hint: ReactNode;
-  action?: ReactNode;
 }) {
   return (
     <Card className="hover:bg-muted/40 relative transition-colors">
@@ -99,7 +96,6 @@ function StatCard({
         </Link>
         <div className="flex items-center justify-between gap-2">
           <p className="text-muted-foreground truncate text-xs">{hint}</p>
-          {action && <div className="relative z-10 shrink-0">{action}</div>}
         </div>
       </CardContent>
     </Card>
@@ -331,20 +327,6 @@ function DashboardPage() {
               icon={<Sparkles className="text-muted-foreground size-4" />}
               value={planValue}
               hint={planHint}
-              action={
-                !subscriptionQuery.isPending &&
-                !subscription && (
-                  <Link
-                    href="/pricing"
-                    className={buttonVariants({
-                      variant: 'outline',
-                      size: 'xs',
-                    })}
-                  >
-                    {m['settings.overview.upgrade']()}
-                  </Link>
-                )
-              }
             />
           )}
           {on.credits && (
@@ -358,14 +340,6 @@ function DashboardPage() {
                   : (creditsQuery.data?.balance ?? '—')
               }
               hint={m['settings.billing.credits_description']()}
-              action={
-                <Link
-                  href="/pricing"
-                  className={buttonVariants({ variant: 'outline', size: 'xs' })}
-                >
-                  {m['settings.credits.purchase']()}
-                </Link>
-              }
             />
           )}
           {on.apikeys && (

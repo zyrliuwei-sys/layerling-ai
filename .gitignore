@@ -40,6 +40,21 @@ wrangler.jsonc
 # misc
 .DS_Store
 *.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+*.jks
+id_rsa*
+id_ed25519*
+id_ecdsa*
+credentials*.json
+service-account*.json
+service_account*.json
+serviceaccount*.json
+.npmrc
+.netrc
+.pypirc
 
 # debug
 .indexnow-backup-*/
@@ -59,6 +74,12 @@ yarn-error.log*
 
 # database
 /data/
+*.db
+*.sqlite
+*.sqlite3
+*.db-*
+*.sqlite-*
+*.sqlite3-*
 /drizzle/
 src/config/db/schema.ts
 

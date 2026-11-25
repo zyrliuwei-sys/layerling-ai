@@ -188,7 +188,8 @@ function CategoriesPage() {
           <Button
             variant="ghost"
             size="icon"
-            className="size-7"
+            className="size-10 sm:size-7"
+            aria-label={m['admin.categories.edit_title']()}
             onClick={() => openEdit(c)}
           >
             <Pencil className="size-3" />
@@ -196,7 +197,8 @@ function CategoriesPage() {
           <Button
             variant="ghost"
             size="icon"
-            className="size-7"
+            className="size-10 sm:size-7"
+            aria-label={m['admin.categories.delete_title']()}
             onClick={() => setDeletingCat(c)}
           >
             <Trash2 className="size-3" />
