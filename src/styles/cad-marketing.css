@@ -801,13 +801,10 @@
   letter-spacing: -0.043em;
   text-wrap: balance;
   overflow-wrap: anywhere;
-}
-.cadm-home-lead h1 span {
-  display: block;
-}
-.cadm-home-lead h1 span + span {
-  margin-top: 0.075em;
   color: var(--brand-link);
+}
+.cadm-home-lead h1::first-line {
+  color: var(--cad-ink);
 }
 .cadm-home-description {
   max-width: 36ch;

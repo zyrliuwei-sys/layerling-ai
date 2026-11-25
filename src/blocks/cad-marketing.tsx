@@ -205,16 +205,10 @@ const maxLidGap = 42;
 
 export function CadHomeHero({ children }: { children: ReactNode }) {
   return (
-    <section
-      className="cadm-shell cadm-home-hero"
-      aria-labelledby="cad-home-title"
-    >
+    <section className="cadm-shell cadm-home-hero">
       <div className="cadm-home-lead">
         <p className="cadm-eyebrow">{m['cad.marketing.home_eyebrow']()}</p>
-        <h1 id="cad-home-title">
-          <span>{m['cad.marketing.home_title_first']()}</span>{' '}
-          <span>{m['cad.marketing.home_title_second']()}</span>
-        </h1>
+        <h1>{m['cad.marketing.home_title']()}</h1>
         <p className="cadm-home-description">{m['cad.editor.home_intro']()}</p>
         <div className="cadm-home-actions">
           <Link
