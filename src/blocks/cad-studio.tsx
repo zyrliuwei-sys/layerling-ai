@@ -726,14 +726,14 @@ function StudioEditor({
       <main className="cad-studio-grid">
         <section
           className="cad-assistant"
-          aria-labelledby="cad-assistant-title"
+          aria-label={m['cad.studio.assistant']()}
         >
           <header className="cad-panel-title">
             <span className="cad-panel-icon">
               <Sparkles aria-hidden="true" />
             </span>
             <div>
-              <h1 id="cad-assistant-title">{m['cad.studio.assistant']()}</h1>
+              <h1>{m['cad.studio.metadata_title']()}</h1>
               <p>
                 {quotaRemaining === undefined
                   ? m['cad.studio.local_prompt']()

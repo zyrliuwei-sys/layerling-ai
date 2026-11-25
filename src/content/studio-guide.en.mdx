@@ -1,0 +1,57 @@
+import { Link } from '../core/i18n/navigation';
+
+## What an AI enclosure generator does
+
+An AI enclosure generator turns a text description into an editable CAD model for a rectangular electronics enclosure. The first preview is built from solid geometry, with separate controls for the body dimensions, wall thickness, corner radius, mounting holes, cable opening, and removable lid. The STL or 3MF mesh you download is the print handoff. Keep the Studio project if you want to change the original dimensions later.
+
+Start with the hardware the case will hold. A board, its connectors, and the wires attached to it often need different kinds of clearance. Describe where those parts sit so you can compare the preview against the assembly on your desk.
+
+## From text prompt to editable solid
+
+1. **Generate the first model.** Give the outside width, depth, and height in millimeters. For example, ask for a 100 × 60 × 30 mm body with 2 mm walls, a removable lid, four screw holes, and a front cable opening. State which side the plug needs to reach and include its measured size if you know it.
+2. **Edit dimensions and check the fit.** Orbit the solid to inspect the inside and the wall around the opening. In the properties panel, adjust the port dimensions or the hole inset, then preview and apply the revision. Compare hole centers in the top view and check the lid in a side view. Save the editable project before exporting.
+3. **Export and slice.** Download an STL or 3MF and open it in your slicer. Check one known measurement, orient the body and lid, and inspect the first layers and the openings in the layer preview before starting the print.
+
+## Dimensions and wall thickness: what to set
+
+**Walls and inside space.** Studio starts with 2 mm walls. For a small prototype, use that as a starting point and inspect how the slicer forms the walls with your nozzle and line width. Subtract twice the wall thickness from each outside horizontal dimension to estimate the room between straight walls. The floor, rounded corners, and the lid reduce the space available for some parts.
+
+**Clearance.** Measure the assembled board with its tallest component, headers, and any bent cable. For an initial test, allow roughly 0.5–1 mm on each side around a board you want to drop into a tray, then adjust using a fit sample. A sliding lid or a captive connector can need different clearance. Test those areas with the material and print settings you plan to use.
+
+**Screw bosses and holes.** A boss is a raised mounting point that gives a screw material to grip. The generator places holes with a shared inset. For individual bosses or an asymmetric mounting pattern, continue in the full CAD editor. Record the screw diameter, head size, and hole centers separately. Check the intended clearance with the actual fastener and a small test piece.
+
+**Openings.** Measure the molded plug and its strain relief as well as the socket on the board. Leave room to insert and remove the plug when the lid is closed. Inspect the toolpath above the opening, where a wide cutout may turn into a bridge or need support.
+
+## Common board sizes
+
+- **Arduino Uno Rev3.** The [official Uno Rev3 specs](https://store.arduino.cc/products/arduino-uno-rev3) list a 68.6 × 53.4 mm footprint. Check the USB and barrel connectors with their plugs attached, and leave room above the pin headers if you will add a shield.
+- **ESP32 DevKit.** The [Espressif DevKitC V4 drawing](https://dl.espressif.com/dl/schematics/esp32_devkitc_v4_dimensions.pdf) shows a board about 48.3 × 27.9 mm. Other ESP32 development boards vary in size and header layout. Measure your board with jumper leads installed and leave access to the USB port and buttons.
+- **Raspberry Pi Pico.** The [Pico datasheet](https://pip-assets.raspberrypi.com/categories/610-raspberry-pi-pico/documents/RP-008307-DS-3-pico-datasheet.pdf) lists a 51 × 21 mm PCB. Its USB port overhangs the board edge. Include the plug and any soldered headers in your height and clearance measurements.
+
+Use board dimensions to estimate the cavity, then add the space your assembly needs before calculating the outside size. Compare the hole centers and connector positions against the physical board before you print a full case.
+
+## STL vs 3MF
+
+Choose STL when a slicer or print service asks for a single mesh. STL does not store units, so confirm that the slicer reads the part in millimeters. Choose 3MF when you want the file to specify units and your slicer supports its model structure. Check that the body and lid import as expected and that the scale matches your CAD measurements. Save any material, orientation, and support settings in your slicer project.
+
+## AI generator vs a full CAD editor
+
+Use the enclosure generator when a rectangular body, optional lid, and adjustable openings cover the design. Use a full editor when the part calls for offset mounting holes, custom bosses, several cutouts, or a bracket made from multiple solids. The <Link href="/layerling-cad">Layerling CAD enclosure design guide</Link> covers measuring a real part, editing geometry, and checking the first print.
+
+## FAQ
+
+### Is it free?
+
+Yes. You can use the guided enclosure commands, edit parameters, and export for free. If an external AI provider is enabled, signed-in accounts also have a free monthly allowance for AI requests.
+
+### Do I need CAD experience?
+
+No. Start with the measured size of your hardware and use the preview to check the fit. You can work from the existing dimensions in the properties panel while you learn how the wall, lid, and holes relate to each other.
+
+### What file formats can I export?
+
+Studio exports STL and 3MF. Pick the format your slicer or print service accepts, then compare the imported size with the dimensions in Studio.
+
+### Can I edit after generating?
+
+Yes. Open the properties panel to change measurements or describe a revision. Preview and apply the changes, then export again when the model fits. Use undo and redo to compare revisions and keep the Studio project for future edits.

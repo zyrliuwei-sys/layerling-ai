@@ -682,12 +682,21 @@ export function CadGuideLink() {
 }
 
 export function CadFaq() {
-  const entries = [
+  const entries: [string, ReactNode][] = [
     [m['cad.marketing.faq_free_q'](), m['cad.marketing.faq_free_a']()],
     [m['cad.marketing.faq_create_q'](), m['cad.marketing.faq_create_a']()],
     [m['cad.marketing.faq_edit_q'](), m['cad.marketing.faq_edit_a']()],
     [m['cad.marketing.faq_formats_q'](), m['cad.marketing.faq_formats_a']()],
-    [m['cad.marketing.faq_install_q'](), m['cad.marketing.faq_install_a']()],
+    [
+      m['cad.marketing.faq_install_q'](),
+      <>
+        {m['cad.marketing.faq_install_a']()}{' '}
+        <Link href="/layerling-cad">
+          {m['cad.marketing.faq_install_download']()}
+        </Link>
+        .
+      </>,
+    ],
     [m['cad.marketing.faq_account_q'](), m['cad.marketing.faq_account_a']()],
   ];
 

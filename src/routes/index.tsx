@@ -59,7 +59,7 @@ function HomePage() {
             className="cadm-online-editor"
             aria-labelledby="cadm-editor-title"
           >
-            <CadOnlineEditor home />
+            <CadOnlineEditor home autoLoad />
           </section>
         </CadHomeHero>
         <CadStudioIntro />

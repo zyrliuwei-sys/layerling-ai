@@ -9,6 +9,7 @@ import {
   sanitizeUtm,
 } from './lib/cookie';
 import { redirectChineseEdition } from './lib/english-only';
+import { canonicalPageRequestPath } from './lib/page-path';
 import { respErr } from './lib/resp';
 import { paraglideMiddleware } from './paraglide/server.js';
 
@@ -219,6 +220,15 @@ export default {
     const url = new URL(req.url);
     const redirect = redirectChineseEdition(req);
     if (redirect) return addResponsePolicies(withMutableHeaders(redirect), url);
+    const pathname = canonicalPageRequestPath(req.method, url.pathname);
+    if (pathname !== url.pathname) {
+      const target = new URL(url);
+      target.pathname = pathname;
+      return addResponsePolicies(
+        withMutableHeaders(Response.redirect(target, 301)),
+        url
+      );
+    }
     if (hasForeignBrowserWrite(req, url)) {
       return addResponsePolicies(
         respErr('Same-origin request required', { status: 403 }),

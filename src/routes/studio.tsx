@@ -4,7 +4,11 @@ import { envConfigs } from '@/config';
 import { CAD_PROMPT_LIMIT } from '@/lib/cad-api';
 import { publicPageHead } from '@/lib/page-head';
 import { m } from '@/paraglide/messages.js';
+import { CadMarketing } from '@/blocks/cad-marketing';
 import { CadStudio } from '@/blocks/cad-studio';
+import StudioGuide from '@/content/studio-guide.en.mdx';
+
+import '@/styles/cad-pages.css';
 
 export const Route = createFileRoute('/studio')({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -28,5 +32,19 @@ export const Route = createFileRoute('/studio')({
 });
 
 function StudioPage() {
-  return <CadStudio search={Route.useSearch()} />;
+  const search = Route.useSearch();
+  return (
+    <>
+      <CadStudio search={search} />
+      {!search.project && (
+        <CadMarketing>
+          <div className="cadm-shell cad-article-main">
+            <article className="cad-article cad-article-copy">
+              <StudioGuide />
+            </article>
+          </div>
+        </CadMarketing>
+      )}
+    </>
+  );
 }

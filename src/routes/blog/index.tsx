@@ -27,6 +27,7 @@ export const Route = createFileRoute('/blog/')({
       path: '/blog',
       title: `${m['blog.title']({}, { locale })} | ${envConfigs.app_name}`,
       description: m['blog.description']({}, { locale }),
+      robots: loaderData?.posts.length ? undefined : 'noindex, follow',
     });
   },
   component: BlogPage,

@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import { getAllConfigs } from '@/modules/config/service';
+import { canonicalPagePath } from '@/lib/page-path';
 import { serverSiteOrigin } from '@/lib/site-origin';
 import { baseLocale, locales, localizeUrl } from '@/paraglide/runtime.js';
 import { getLocalPosts, mergePosts } from '@/content/posts';
@@ -8,10 +9,8 @@ import { getLocalPosts, mergePosts } from '@/content/posts';
 const STATIC_PATHS = [
   '',
   '/studio',
-  '/editor',
   '/examples',
   '/layerling-cad',
-  '/blog',
   '/privacy-policy',
   '/terms-of-service',
 ];
@@ -24,7 +23,7 @@ type Entry = {
 };
 
 function urlFor(path: string, locale: string, origin: string): string {
-  return localizeUrl(`${origin}${path || '/'}`, {
+  return localizeUrl(new URL(canonicalPagePath(path), origin), {
     locale: locale as (typeof locales)[number],
   }).href;
 }
@@ -68,10 +67,11 @@ export const Route = createFileRoute('/sitemap.xml')({
         const configs = getAllConfigs().catch(() => null);
         const entries: Entry[] = STATIC_PATHS.map((path) => ({
           path,
-          changeFrequency: path === '/blog' ? 'daily' : 'weekly',
+          changeFrequency: 'weekly',
           priority: path === '' ? 1 : 0.8,
         }));
 
+        let posts = getLocalPosts(baseLocale);
         // Blog posts: db posts merged with local MDX posts.
         try {
           const { listPublishedArticles } =
@@ -84,25 +84,24 @@ export const Route = createFileRoute('/sitemap.xml')({
             createdAt: new Date(row.createdAt).toISOString(),
             source: 'db' as const,
           }));
-          const posts = mergePosts(dbPosts, getLocalPosts(baseLocale));
-          for (const post of posts) {
-            entries.push({
-              path: `/blog/${encodeURIComponent(post.slug)}`,
-              lastModified: post.createdAt,
-              changeFrequency: 'monthly',
-              priority: 0.6,
-            });
-          }
+          posts = mergePosts(dbPosts, posts);
         } catch {
-          // Database unreachable — static paths + local posts still listed.
-          for (const post of getLocalPosts(baseLocale)) {
-            entries.push({
-              path: `/blog/${encodeURIComponent(post.slug)}`,
-              lastModified: post.createdAt,
-              changeFrequency: 'monthly',
-              priority: 0.6,
-            });
-          }
+          // Database unreachable — local posts still qualify for indexing.
+        }
+        if (posts.length > 0) {
+          entries.push({
+            path: '/blog',
+            changeFrequency: 'weekly',
+            priority: 0.8,
+          });
+        }
+        for (const post of posts) {
+          entries.push({
+            path: `/blog/${encodeURIComponent(post.slug)}`,
+            lastModified: post.createdAt,
+            changeFrequency: 'monthly',
+            priority: 0.6,
+          });
         }
 
         if ((await configs)?.guest_post_enabled === 'true') {

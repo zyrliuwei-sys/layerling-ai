@@ -1,4 +1,5 @@
 import { envConfigs } from '@/config';
+import { canonicalPagePath } from '@/lib/page-path';
 import { serverSiteOrigin } from '@/lib/site-origin';
 
 const defaultImage = '/imgs/cad/share-enclosure.jpg';
@@ -10,6 +11,7 @@ export function publicPageHead({
   type = 'website',
   image,
   imageAlt,
+  robots,
 }: {
   path: string;
   title: string;
@@ -17,9 +19,10 @@ export function publicPageHead({
   type?: 'website' | 'article';
   image?: string;
   imageAlt?: string;
+  robots?: string;
 }) {
   const origin = serverSiteOrigin();
-  const url = new URL(path, origin).href;
+  const url = new URL(canonicalPagePath(path), origin).href;
   let imageUrl = new URL(defaultImage, origin).href;
   if (image) {
     try {
@@ -40,6 +43,7 @@ export function publicPageHead({
     meta: [
       { title },
       { name: 'description', content: description },
+      ...(robots ? [{ name: 'robots', content: robots }] : []),
       { property: 'og:type', content: type },
       { property: 'og:site_name', content: envConfigs.app_name },
       { property: 'og:url', content: url },

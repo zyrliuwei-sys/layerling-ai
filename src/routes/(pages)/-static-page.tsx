@@ -9,6 +9,7 @@ import { baseLocale, getLocale } from '@/paraglide/runtime.js';
 
 type PageMeta = {
   title: string;
+  heading?: string;
   description: string;
   updated_at: string;
   cover?: string;
@@ -80,7 +81,7 @@ function StaticPage() {
     >
       <header className="cad-article-heading">
         <div>
-          <h1>{meta.title}</h1>
+          <h1>{meta.heading ?? meta.title}</h1>
           <p>{meta.description}</p>
           {!meta.sections && (
             <p className="cad-article-date">

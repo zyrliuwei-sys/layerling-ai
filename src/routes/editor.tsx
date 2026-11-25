@@ -18,6 +18,7 @@ export const Route = createFileRoute('/editor')({
       path: '/editor',
       title: `${m['cad.editor.seo_title']()} | ${envConfigs.app_name}`,
       description: m['cad.editor.description'](),
+      robots: 'noindex, follow',
     }),
   component: EditorPage,
 });

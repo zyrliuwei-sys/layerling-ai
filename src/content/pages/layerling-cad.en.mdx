@@ -3,13 +3,18 @@ import { Link } from '../../core/i18n/navigation';
 import { m } from '../../paraglide/messages.js';
 
 export const meta = {
-  title: 'Design Models for 3D Printing with layerling ai',
+  title: 'Layerling CAD — Design 3D Printed Enclosures',
+  heading: 'Layerling CAD for 3D Printed Enclosures',
   description:
-    'Generate an electronics enclosure from text, refine its dimensions, and export an STL or 3MF file for 3D printing.',
+    'Layerling CAD is a free browser-based CAD editor for designing 3D printed enclosures. Measure your board, set wall thickness, export STL or 3MF.',
   updated_at: '2026-11-25',
   cover: '/imgs/cad/enclosure-assembled.webp',
   share_image: '/imgs/cad/share-enclosure.jpg',
   sections: [
+    {
+      id: 'download-and-getting-started',
+      title: 'Download and getting started',
+    },
     { id: 'choose-a-workflow', title: 'Choose a workflow' },
     { id: 'measure-your-part', title: 'Measure your part' },
     { id: 'design-an-enclosure', title: 'Design an enclosure' },
@@ -18,6 +23,12 @@ export const meta = {
     { id: 'check-your-first-print', title: 'Check your first print' },
   ],
 };
+
+<h2 id="download-and-getting-started">
+  Layerling CAD download and getting started
+</h2>
+
+The <Link href={layerlingDownloadUrl} download>Layerling download</Link> is the static editor ZIP from the project's GitHub releases. Extract the archive to host your own copy of the browser editor. Follow the [Layerling getting started guide](https://layerling.com/guide/getting-started.html) for a short Layerling tutorial on placing shapes, cutting a hole, and exporting your first part.
 
 <h2 id="choose-a-workflow">Choose a workflow for online CAD</h2>
 
@@ -55,7 +66,7 @@ Open the manual editor for features beyond Studio's rectangular enclosure contro
 
 If you already have a fixture, compare the real part with your design as you work. Rotate the view to check intersections, and use a side or top view when positioning a cutter. Keep a copy before grouping shapes so you can return to the earlier design. Rounded edges may make a case easier to handle, while a compact radius leaves more material around nearby corners and mounting holes.
 
-Layerling can import 3D files, including STL, 3MF, and STEP. To continue with a Studio model, download it and open it in the manual editor. A mesh export carries the geometry, so retain the Studio project if you also want to edit its original dimensions or revisit its revision history. The manual editor saves its projects separately in the browser. [Layerling getting started guide](https://layerling.com/guide/getting-started.html)
+Layerling can import 3D files, including STL, 3MF, and STEP. To continue with a Studio model, download it and open it in the manual editor. A mesh export carries the geometry, so retain the Studio project if you also want to edit its original dimensions or revisit its revision history. The manual editor saves its projects separately in the browser.
 
 <h2 id="export-stl-or-3mf">Export a 3D model as STL or 3MF</h2>
 
