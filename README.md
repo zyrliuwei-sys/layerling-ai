@@ -116,6 +116,19 @@ requires `CONFIG_ENCRYPTION_KEY` in the server environment.
 | `pnpm admin:token` | Manage agent tokens; `sync-permissions` after upgrades |
 | `pnpm cf:deploy`   | Build and deploy to Cloudflare Workers                 |
 
+## Cloudflare Workers deployment
+
+The production Worker `layerling-ai` on [layerling.org](https://layerling.org)
+deploys from `main` through Workers Builds. Use the repository root and
+`pnpm run cf:deploy:ci` as the deploy command. Set
+`CLOUDFLARE_D1_DATABASE_ID` to the production D1 database ID in the build
+environment. The deploy script creates the Wrangler config for the build and
+binds the existing database as `DB`.
+
+Set `AUTH_SECRET` and `CONFIG_ENCRYPTION_KEY` as Worker runtime secrets.
+Review and apply production D1 migrations separately before deploying code
+that depends on a schema change. Workers Builds deploys application code only.
+
 ## Claude Code Skills
 
 | Skill                | What it does                                                   |
