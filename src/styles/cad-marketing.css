@@ -1088,10 +1088,22 @@
     font-size: var(--text-7xl);
   }
 }
-@media (max-width: 1000px) {
+@media (max-width: 1050px) {
   .cadm-home-hero {
-    gap: 24px;
+    max-width: 812px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(18px, 3vw, 28px);
   }
+  .cadm-home-lead h1 {
+    max-width: 20ch;
+    font-size: clamp(2.55rem, 6vw, 4.5rem);
+  }
+  .cadm-home-description {
+    max-width: 54ch;
+    margin-block: 14px 18px;
+  }
+}
+@media (max-width: 1000px) {
   .cadm-assembly-controls {
     gap: 14px;
   }
@@ -1102,15 +1114,6 @@
   }
 }
 @media (max-width: 680px) {
-  .cadm-home-hero {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .cadm-home-lead h1 {
-    font-size: clamp(2.55rem, 8vw, 4.5rem);
-  }
-  .cadm-home-description {
-    max-width: 45ch;
-  }
   .cadm-assembly-board {
     aspect-ratio: 1.38;
   }

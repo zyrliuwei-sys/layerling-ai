@@ -155,7 +155,9 @@ html:has(.cad-editor-stage--expanded) {
 .cadm-online-editor
   .cad-editor-stage:not(:fullscreen, .cad-editor-stage--expanded)
   .cad-editor-frame {
-  height: clamp(440px, calc(100svh - 225px), 740px);
+  /* Keep the original 810 × 740 homepage viewport proportional as it resizes. */
+  aspect-ratio: 81 / 74;
+  height: auto;
   border: 0;
   border-radius: 0;
 }
