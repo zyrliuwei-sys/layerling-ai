@@ -28,6 +28,7 @@ import { CAD_LAUNCH_PROMPT, CAD_PROMPT_LIMIT } from '@/lib/cad-api';
 import { openCookieSettings } from '@/lib/cookie-consent';
 import { m } from '@/paraglide/messages.js';
 import { useUserPermissions } from '@/hooks/use-user-permissions';
+import { FooterBadgeList } from '@/components/footer-badge-list';
 
 import '@fontsource-variable/geist';
 import '@fontsource-variable/geist-mono';
@@ -765,6 +766,9 @@ export function CadSiteFooter() {
             </button>
           )}
         </div>
+      </div>
+      <div className="cadm-shell">
+        <FooterBadgeList className="pb-8" showDefaults={false} />
       </div>
     </footer>
   );
