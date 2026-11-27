@@ -45,6 +45,7 @@ export function CadOnlineEditor({
 }) {
   const url = editorUrl();
   const stageRef = useRef<HTMLDivElement>(null);
+  const fullscreenButtonRef = useRef<HTMLButtonElement>(null);
   const hash = useLocation({ select: (location) => location.hash });
   const [active, setActive] = useState(!home || autoLoad);
   const [loaded, setLoaded] = useState(false);
@@ -77,6 +78,10 @@ export function CadOnlineEditor({
     if (home && !autoLoad && active)
       stageRef.current?.focus({ preventScroll: true });
   }, [active, autoLoad, home]);
+
+  useEffect(() => {
+    if (fullView) fullscreenButtonRef.current?.focus({ preventScroll: true });
+  }, [fullView]);
 
   async function toggleFullscreen() {
     const stage = stageRef.current;
@@ -149,6 +154,7 @@ export function CadOnlineEditor({
             {active ? (
               <button
                 type="button"
+                ref={fullscreenButtonRef}
                 className="cadm-button cadm-button--primary"
                 onClick={toggleFullscreen}
               >
@@ -175,6 +181,18 @@ export function CadOnlineEditor({
         </div>
         {active && (
           <div className="cad-editor-viewport">
+            {home && !fullView && (
+              <button
+                type="button"
+                className="cad-editor-touch-launch"
+                onClick={toggleFullscreen}
+              >
+                <span>
+                  <Maximize size={17} aria-hidden="true" />
+                  {m['cad.editor.open_fullscreen']()}
+                </span>
+              </button>
+            )}
             {!loaded && home && !autoLoad && (
               <div className="cad-editor-loading" role="status">
                 <strong>{m['cad.editor.loading']()}</strong>

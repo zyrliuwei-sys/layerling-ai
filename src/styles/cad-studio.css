@@ -490,6 +490,9 @@
 .cad-canvas-bottom {
   bottom: 12px;
 }
+.cad-canvas-bottom .cad-canvas-controls-touch {
+  display: none;
+}
 .cad-canvas-badge,
 .cad-canvas-bottom > span {
   align-items: center;
@@ -933,7 +936,7 @@
   .cad-parameter-form {
     padding-inline: 11px;
   }
-  .cad-canvas-bottom > span:nth-child(2) {
+  .cad-canvas-bottom .cad-canvas-controls-desktop {
     display: none;
   }
 }
@@ -978,7 +981,7 @@
   .cad-chat-scroll {
     max-height: 340px;
   }
-  .cad-canvas-bottom > span:nth-child(2) {
+  .cad-canvas-bottom .cad-canvas-controls-desktop {
     display: inline-flex;
   }
 }
@@ -1042,7 +1045,7 @@
   .cad-preview-bar {
     bottom: 45px;
   }
-  .cad-canvas-bottom > span:nth-child(2) {
+  .cad-canvas-bottom .cad-canvas-controls-desktop {
     display: none;
   }
   .cad-projects-page {
@@ -1057,6 +1060,60 @@
   }
   .cad-project-date {
     display: none;
+  }
+}
+
+@media (max-width: 800px) and (pointer: coarse) {
+  .cad-workspace-nav a,
+  .cad-button,
+  .cad-prompt-ideas button,
+  .cad-model-parts button,
+  .cad-canvas-views button,
+  .cad-lid-field {
+    min-height: 44px;
+  }
+  .cad-workspace-nav a,
+  .cad-button-icon,
+  .cad-canvas-views button {
+    min-width: 44px;
+  }
+  .cad-canvas-views button {
+    justify-content: center;
+  }
+  .cad-doc-title > div {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .cad-doc-title input {
+    width: 100%;
+    min-height: 26px;
+  }
+  .cad-doc-title input,
+  .cad-prompt-form textarea,
+  .cad-export-format select,
+  .cad-parameter-fields input,
+  .cad-port-field select {
+    font-size: max(16px, 1rem);
+  }
+  .cad-export-format select {
+    height: 42px;
+  }
+  .cad-parameter-fields input,
+  .cad-port-field select {
+    height: 44px;
+  }
+  .cad-viewport-canvas canvas {
+    /* OrbitControls sets an inline touch-action. Allow page scrolling over it. */
+    touch-action: pan-y !important;
+  }
+  .cad-canvas-state {
+    top: 66px;
+  }
+  .cad-canvas-bottom .cad-canvas-controls-desktop {
+    display: none;
+  }
+  .cad-canvas-bottom .cad-canvas-controls-touch {
+    display: inline-flex;
   }
 }
 

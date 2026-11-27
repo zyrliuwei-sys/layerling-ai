@@ -882,8 +882,11 @@ function StudioEditor({
               {(geometry?.params ?? committed).depth} ×{' '}
               {(geometry?.params ?? committed).height} mm
             </span>
-            <span>
+            <span className="cad-canvas-controls-desktop">
               <CircleHelp aria-hidden="true" /> {m['cad.studio.controls']()}
+            </span>
+            <span className="cad-canvas-controls-touch">
+              {m['cad.studio.controls_touch']()}
             </span>
           </div>
           {staged && (

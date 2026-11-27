@@ -52,6 +52,7 @@ html:has(.cad-editor-stage--expanded) {
 .cad-editor-stage--expanded {
   position: fixed;
   inset: 0;
+  block-size: 100dvh;
   z-index: 100;
   visibility: visible;
 }
@@ -207,6 +208,9 @@ html:has(.cad-editor-stage--expanded) {
 .cad-editor-viewport {
   position: relative;
 }
+.cad-editor-touch-launch {
+  display: none;
+}
 .cad-editor-loading {
   position: absolute;
   z-index: 1;
@@ -255,10 +259,47 @@ html:has(.cad-editor-stage--expanded) {
     display: none;
   }
   .cadm-online-editor .cad-editor-open-tab {
-    min-width: 39px;
+    min-width: 44px;
   }
   .cadm-online-editor .cad-editor-intro h2 {
     font-size: 0.97rem;
+  }
+}
+@media (max-width: 800px) and (pointer: coarse) {
+  .cad-editor-resources a {
+    min-height: 44px;
+  }
+}
+@media (max-width: 600px) and (pointer: coarse) {
+  .cad-editor-touch-launch {
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    display: grid;
+    place-items: end center;
+    padding: 10px;
+    background: linear-gradient(
+      to top,
+      color-mix(in oklab, var(--brand-board), transparent 24%),
+      transparent 70%
+    );
+    touch-action: pan-y pinch-zoom;
+  }
+  .cad-editor-touch-launch span {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding-inline: 12px;
+    border-radius: 6px;
+    background: var(--brand-signal);
+    color: var(--brand-signal-ink);
+    font-size: 0.83rem;
+    font-weight: 620;
+  }
+  .cad-editor-touch-launch:focus-visible {
+    outline-offset: -3px;
   }
 }
 @media (max-width: 460px) {
